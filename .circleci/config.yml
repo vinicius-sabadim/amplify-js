@@ -362,9 +362,9 @@ jobs:
           command: |
             mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
             echo $SSH_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
-            git clone -b katie_rn_storage_upgrade $AMPLIFY_JS_SAMPLES_STAGING_URL
+            git clone -b rn-upgrade-integ-test $AMPLIFY_JS_SAMPLES_STAGING_URL
             cd amplify-js-samples-staging
-            git checkout katie_rn_storage_upgrade
+            git checkout rn-upgrade-integ-test
             yarn
       - save_cache:
           key: amplify-js-{{ .Branch }}-{{ checksum "amplify-js-samples-staging/yarn.lock" }}
