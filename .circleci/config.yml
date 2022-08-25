@@ -1639,13 +1639,13 @@ workflows:
             # - integ_react_graphql_api
             # - integ_react_geo
             # - integ_next_datastore_owner_auth
-      - post_release:
-          filters:
-            branches:
-              only:
-                - release
-          requires:
-            - deploy
+      # - post_release:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - release
+      #     requires:
+      #       - deploy
   # Scheduled smoke test workflow
   # Jobs are pulled from the getting-started-smoke-test inline orb defined below
   canaries:
