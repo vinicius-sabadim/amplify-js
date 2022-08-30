@@ -47,7 +47,7 @@ case $1 in
 	echo "Android Virtual Device is now ready."
 	;;
   start-emulator)
-    $ANDROID_HOME/emulator/emulator @TestingAVD -version
-	$ANDROID_HOME/emulator/emulator @TestingAVD -cores 1 -gpu auto -accel on -memory 1024 -no-audio -no-snapshot -no-boot-anim -no-window
+    $ANDROID_HOME/emulator/emulator @test -version
+	$ANDROID_HOME/emulator/emulator @test -cores 1 -gpu auto -accel on -memory 1024 -no-audio -no-snapshot -no-boot-anim -no-window
 	;;
 esac
