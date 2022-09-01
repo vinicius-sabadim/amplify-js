@@ -40,7 +40,7 @@ executors:
   android-executor:
     machine:
       image: android:2022.08.1
-    resource_class: xxlarge
+    resource_class: 2xlarge
 
 test_env_vars: &test_env_vars
   environment:
@@ -1015,127 +1015,127 @@ jobs:
     steps:
       - integ_test_rn_android
 
-# #   integ_rn_ios_datastore_sqlite_adapter:
-# #     executor: macos-executor
-# #     <<: *test_env_vars
-# #     working_directory: ~/amplify-js-samples-staging/samples/react-native/datastore/SQLiteAdapter
-# #     steps:
-# #       - integ_test_rn_ios
+  # #   integ_rn_ios_datastore_sqlite_adapter:
+  # #     executor: macos-executor
+  # #     <<: *test_env_vars
+  # #     working_directory: ~/amplify-js-samples-staging/samples/react-native/datastore/SQLiteAdapter
+  # #     steps:
+  # #       - integ_test_rn_ios
 
-#   integ_datastore_auth:
-#     parameters:
-#       scenario:
-#         type: string
-#     executor: js-test-executor
-#     <<: *test_env_vars
-#     working_directory: ~/amplify-js-samples-staging/samples
-#     steps:
-#       - prepare_test_env
-#       - integ_test_js:
-#           test_name: 'DataStore Auth - Chrome'
-#           framework: react
-#           category: datastore
-#           sample_name: << parameters.scenario >>
-#           spec: << parameters.scenario >>
-#           browser: chrome
-#       - integ_test_js:
-#           test_name: 'DataStore Auth - Firefox'
-#           framework: react
-#           category: datastore
-#           sample_name: << parameters.scenario >>
-#           spec: << parameters.scenario >>
-#           browser: firefox
+  #   integ_datastore_auth:
+  #     parameters:
+  #       scenario:
+  #         type: string
+  #     executor: js-test-executor
+  #     <<: *test_env_vars
+  #     working_directory: ~/amplify-js-samples-staging/samples
+  #     steps:
+  #       - prepare_test_env
+  #       - integ_test_js:
+  #           test_name: 'DataStore Auth - Chrome'
+  #           framework: react
+  #           category: datastore
+  #           sample_name: << parameters.scenario >>
+  #           spec: << parameters.scenario >>
+  #           browser: chrome
+  #       - integ_test_js:
+  #           test_name: 'DataStore Auth - Firefox'
+  #           framework: react
+  #           category: datastore
+  #           sample_name: << parameters.scenario >>
+  #           spec: << parameters.scenario >>
+  #           browser: firefox
 
-#   integ_datastore_auth_v2:
-#     parameters:
-#       scenario:
-#         type: string
-#     executor: js-test-executor
-#     <<: *test_env_vars
-#     working_directory: ~/amplify-js-samples-staging/samples
-#     steps:
-#       - prepare_test_env
-#       - integ_test_js:
-#           test_name: 'DataStore Auth CLI v2 - Chrome'
-#           framework: react
-#           category: datastore
-#           sample_name: v2/<< parameters.scenario >>-v2
-#           spec: << parameters.scenario >>
-#           browser: chrome
-#       - integ_test_js:
-#           test_name: 'DataStore Auth CLI v2 - Firefox'
-#           framework: react
-#           category: datastore
-#           sample_name: v2/<< parameters.scenario >>-v2
-#           spec: << parameters.scenario >>
-#           browser: firefox
-#       # integ_duplicate_packages:
-#       #   parameters:
-#       #     browser:
-#       #       type: string
-#       #   executor: js-test-executor
-#       #   <<: *test_env_vars
-#       #   working_directory: ~/amplify-js-samples-staging/samples/react/version-conflict/duplicate-packages
-#       #   steps:
-#       #     - prepare_test_env
-#       #     - integ_test_js:
-#       #         test_name: 'Duplicate Package Errors'
-#       #         framework: react
-#       #         category: version-conflict
-#       #         sample_name: duplicate-packages
-#       #         spec: duplicate-packages
-#       #         browser: << parameters.browser >>
-#   integ_auth_test_cypress_no_ui:
-#     working_directory: ~/amplify-js-samples-staging/
-#     executor: js-test-executor
-#     steps:
-#       - prepare_no_ui_test_env
-#       - integ_test_cypress_no_ui:
-#           test_name: 'Token revocation'
-#           category: 'auth'
-#           spec: 'token-revocation'
-#   integ_react_geo:
-#     parameters:
-#       browser:
-#         type: string
-#     executor: js-test-executor
-#     <<: *test_env_vars
-#     working_directory: ~/amplify-js-samples-staging/samples
-#     steps:
-#       - prepare_test_env
-#       - integ_test_js:
-#           test_name: 'Display Map'
-#           framework: react
-#           category: geo
-#           sample_name: display-map
-#           spec: display-map
-#           # Temp fix:
-#           browser: chrome
-#       - integ_test_js:
-#           test_name: 'Search Outside Map'
-#           framework: react
-#           category: geo
-#           sample_name: search-outside-map
-#           spec: search-outside-map
-#           # Temp fix:
-#           browser: chrome
+  #   integ_datastore_auth_v2:
+  #     parameters:
+  #       scenario:
+  #         type: string
+  #     executor: js-test-executor
+  #     <<: *test_env_vars
+  #     working_directory: ~/amplify-js-samples-staging/samples
+  #     steps:
+  #       - prepare_test_env
+  #       - integ_test_js:
+  #           test_name: 'DataStore Auth CLI v2 - Chrome'
+  #           framework: react
+  #           category: datastore
+  #           sample_name: v2/<< parameters.scenario >>-v2
+  #           spec: << parameters.scenario >>
+  #           browser: chrome
+  #       - integ_test_js:
+  #           test_name: 'DataStore Auth CLI v2 - Firefox'
+  #           framework: react
+  #           category: datastore
+  #           sample_name: v2/<< parameters.scenario >>-v2
+  #           spec: << parameters.scenario >>
+  #           browser: firefox
+  #       # integ_duplicate_packages:
+  #       #   parameters:
+  #       #     browser:
+  #       #       type: string
+  #       #   executor: js-test-executor
+  #       #   <<: *test_env_vars
+  #       #   working_directory: ~/amplify-js-samples-staging/samples/react/version-conflict/duplicate-packages
+  #       #   steps:
+  #       #     - prepare_test_env
+  #       #     - integ_test_js:
+  #       #         test_name: 'Duplicate Package Errors'
+  #       #         framework: react
+  #       #         category: version-conflict
+  #       #         sample_name: duplicate-packages
+  #       #         spec: duplicate-packages
+  #       #         browser: << parameters.browser >>
+  #   integ_auth_test_cypress_no_ui:
+  #     working_directory: ~/amplify-js-samples-staging/
+  #     executor: js-test-executor
+  #     steps:
+  #       - prepare_no_ui_test_env
+  #       - integ_test_cypress_no_ui:
+  #           test_name: 'Token revocation'
+  #           category: 'auth'
+  #           spec: 'token-revocation'
+  #   integ_react_geo:
+  #     parameters:
+  #       browser:
+  #         type: string
+  #     executor: js-test-executor
+  #     <<: *test_env_vars
+  #     working_directory: ~/amplify-js-samples-staging/samples
+  #     steps:
+  #       - prepare_test_env
+  #       - integ_test_js:
+  #           test_name: 'Display Map'
+  #           framework: react
+  #           category: geo
+  #           sample_name: display-map
+  #           spec: display-map
+  #           # Temp fix:
+  #           browser: chrome
+  #       - integ_test_js:
+  #           test_name: 'Search Outside Map'
+  #           framework: react
+  #           category: geo
+  #           sample_name: search-outside-map
+  #           spec: search-outside-map
+  #           # Temp fix:
+  #           browser: chrome
 
-#   integ_next_datastore_owner_auth:
-#     parameters:
-#       browser:
-#         type: string
-#     executor: js-test-executor
-#     <<: *test_env_vars
-#     working_directory: ~/amplify-js-samples-staging/samples/next/datastore/owner-based-default
-#     steps:
-#       - prepare_test_env
-#       - integ_test_js:
-#           test_name: 'next owner auth'
-#           framework: next
-#           category: datastore
-#           sample_name: owner-based-default
-#           spec: next-owner-based-default
-#           browser: << parameters.browser >>
+  #   integ_next_datastore_owner_auth:
+  #     parameters:
+  #       browser:
+  #         type: string
+  #     executor: js-test-executor
+  #     <<: *test_env_vars
+  #     working_directory: ~/amplify-js-samples-staging/samples/next/datastore/owner-based-default
+  #     steps:
+  #       - prepare_test_env
+  #       - integ_test_js:
+  #           test_name: 'next owner auth'
+  #           framework: next
+  #           category: datastore
+  #           sample_name: owner-based-default
+  #           spec: next-owner-based-default
+  #           browser: << parameters.browser >>
 
   deploy:
     executor: macos-executor
