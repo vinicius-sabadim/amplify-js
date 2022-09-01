@@ -40,7 +40,7 @@ executors:
   android-executor:
     machine:
       image: android:2022.08.1
-    resource_class: xxlarge
+    resource_class: 2xlarge
 
 test_env_vars: &test_env_vars
   environment:
