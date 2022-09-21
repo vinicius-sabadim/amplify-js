@@ -18,7 +18,6 @@ import { AuthErrorStrings } from './common/AuthErrorStrings';
  * @deprecated use named import
  */
 export { CognitoHostedUIIdentityProvider, AuthErrorStrings };
-
 export {
 	CognitoProvider,
 	AmplifyCognitoUser,
@@ -36,8 +35,6 @@ export {
 	GRAPHQL_AUTH_MODE,
 } from './types';
 
-export { Auth } from './Auth';
-export { Auth as default } from './Auth';
 export * from './types';
 
 export { appendToCognitoUserAgent } from 'amazon-cognito-identity-js';
