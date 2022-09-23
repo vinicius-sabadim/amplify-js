@@ -10,13 +10,13 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-import { Storage, StorageClass } from './Storage';
+import { StorageInstance, Storage } from './Storage';
 
 /**
  * @deprecated use named import
  */
-export default Storage;
+export default StorageInstance;
 
-export { StorageClass, Storage };
+export { Storage as StorageClass, StorageInstance as Storage };
 export * from './providers';
 export * from './types';

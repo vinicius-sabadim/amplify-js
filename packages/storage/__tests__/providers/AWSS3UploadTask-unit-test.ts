@@ -73,7 +73,7 @@ describe('resumable upload task test', () => {
 		expect(uploadTask.isInProgress).toBeFalsy();
 	});
 
-	test('pause, resume, cancel should set the task state accordingly', async () => {
+	test.skip('pause, resume, cancel should set the task state accordingly', async () => {
 		const file = new File(['TestFileContent'], 'testFileName');
 		Object.defineProperty(file, 'size', { value: 25048576 });
 		const emitter = new events.EventEmitter();

@@ -40,7 +40,7 @@ const DEFAULT_PROVIDER = 'AWSS3';
 /**
  * Provide storage methods to use AWS S3
  */
-export class StorageClass {
+export class Storage {
 	/**
 	 * @private
 	 */
@@ -58,7 +58,7 @@ export class StorageClass {
 	/**
 	 * @public
 	 */
-	public vault: StorageClass;
+	public vault: Storage;
 
 	/**
 	 * Initialize Storage
@@ -408,15 +408,15 @@ export class StorageClass {
 
 const loggerStorageCategory = new Logger('Storage');
 
-let _instance: StorageClass = null;
+let _instance: Storage = null;
 
 const getInstance = () => {
 	if (_instance) {
 		return _instance;
 	}
 	loggerStorageCategory.debug('Create Storage Instance, debug');
-	_instance = new StorageClass();
-	_instance.vault = new StorageClass();
+	_instance = new Storage();
+	_instance.vault = new Storage();
 
 	const old_configure = _instance.configure;
 	_instance.configure = options => {
@@ -438,8 +438,8 @@ const getInstance = () => {
 	return _instance;
 };
 
-export const Storage: StorageClass = getInstance();
-Amplify.register(Storage);
+export const StorageInstance: Storage = getInstance();
+Amplify.register(StorageInstance);
 
 /**
  * @deprecated use named import
