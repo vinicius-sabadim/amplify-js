@@ -11,7 +11,7 @@
  * and limitations under the License.
  */
 
-import { ConsoleLogger as Logger, Parser } from '@aws-amplify/core';
+import { Amplify, ConsoleLogger as Logger, Parser } from '@aws-amplify/core';
 import { AWSS3Provider } from './providers';
 import {
 	StorageCopySource,
@@ -34,13 +34,13 @@ import axios, { CancelTokenSource } from 'axios';
 import { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { AWSS3UploadTask } from './providers/AWSS3UploadTask';
 
-const logger = new Logger('StorageClass');
+const loggerStorageClass = new Logger('StorageClass');
 
 const DEFAULT_PROVIDER = 'AWSS3';
 /**
  * Provide storage methods to use AWS S3
  */
-export class Storage {
+export class StorageClass {
 	/**
 	 * @private
 	 */
@@ -58,7 +58,7 @@ export class Storage {
 	/**
 	 * @public
 	 */
-	public vault: Storage;
+	public vault: StorageClass;
 
 	/**
 	 * Initialize Storage
@@ -68,7 +68,7 @@ export class Storage {
 		this._config = {};
 		this._pluggables = [];
 		this._cancelTokenSourceMap = new WeakMap<Promise<any>, CancelTokenSource>();
-		logger.debug('Storage Options', this._config);
+		loggerStorageClass.debug('Storage Options', this._config);
 
 		this.get = this.get.bind(this);
 		this.put = this.put.bind(this);
@@ -104,7 +104,7 @@ export class Storage {
 			pluggable => pluggable.getProviderName() === providerName
 		);
 		if (pluggable === undefined) {
-			logger.debug('No plugin found with providerName', providerName);
+			loggerStorageClass.debug('No plugin found with providerName', providerName);
 			return null;
 		} else return pluggable;
 	}
@@ -126,7 +126,7 @@ export class Storage {
 	 * @return {Object} - Current configuration
 	 */
 	configure(config?) {
-		logger.debug('configure Storage');
+		loggerStorageClass.debug('configure Storage');
 		if (!config) return this._config;
 
 		const amplifyConfig = Parser.parseMobilehubConfig(config);
@@ -227,7 +227,7 @@ export class Storage {
 		if (cancelTokenSource) {
 			cancelTokenSource.cancel(message);
 		} else {
-			logger.debug('The request does not map to any cancel token');
+			loggerStorageClass.debug('The request does not map to any cancel token');
 		}
 	}
 
@@ -254,7 +254,7 @@ export class Storage {
 			pluggable => pluggable.getProviderName() === provider
 		);
 		if (prov === undefined) {
-			logger.debug('No plugin found with providerName', provider);
+			loggerStorageClass.debug('No plugin found with providerName', provider);
 			return Promise.reject(
 				'No plugin found in Storage for the provider'
 			) as StorageCopyOutput<T>;
@@ -293,7 +293,7 @@ export class Storage {
 			pluggable => pluggable.getProviderName() === provider
 		);
 		if (prov === undefined) {
-			logger.debug('No plugin found with providerName', provider);
+			loggerStorageClass.debug('No plugin found with providerName', provider);
 			return Promise.reject(
 				'No plugin found in Storage for the provider'
 			) as StorageGetOutput<T>;
@@ -334,7 +334,7 @@ export class Storage {
 			pluggable => pluggable.getProviderName() === provider
 		);
 		if (prov === undefined) {
-			logger.debug('No plugin found with providerName', provider);
+			loggerStorageClass.debug('No plugin found with providerName', provider);
 			return Promise.reject(
 				'No plugin found in Storage for the provider'
 			) as StoragePutOutput<T>;
@@ -369,7 +369,7 @@ export class Storage {
 			pluggable => pluggable.getProviderName() === provider
 		);
 		if (prov === undefined) {
-			logger.debug('No plugin found with providerName', provider);
+			loggerStorageClass.debug('No plugin found with providerName', provider);
 			return Promise.reject(
 				'No plugin found in Storage for the provider'
 			) as StorageRemoveOutput<T>;
@@ -396,7 +396,7 @@ export class Storage {
 			pluggable => pluggable.getProviderName() === provider
 		);
 		if (prov === undefined) {
-			logger.debug('No plugin found with providerName', provider);
+			loggerStorageClass.debug('No plugin found with providerName', provider);
 			return Promise.reject(
 				'No plugin found in Storage for the provider'
 			) as StorageListOutput<T>;
@@ -404,6 +404,42 @@ export class Storage {
 		return prov.list(path, config) as StorageListOutput<T>;
 	}
 }
+
+
+const loggerStorageCategory = new Logger('Storage');
+
+let _instance: StorageClass = null;
+
+const getInstance = () => {
+	if (_instance) {
+		return _instance;
+	}
+	loggerStorageCategory.debug('Create Storage Instance, debug');
+	_instance = new StorageClass();
+	_instance.vault = new StorageClass();
+
+	const old_configure = _instance.configure;
+	_instance.configure = options => {
+		loggerStorageCategory.debug('storage configure called');
+		const vaultConfig = { ...old_configure.call(_instance, options) };
+
+		// set level private for each provider for the vault
+		Object.keys(vaultConfig).forEach(providerName => {
+			if (typeof vaultConfig[providerName] !== 'string') {
+				vaultConfig[providerName] = {
+					...vaultConfig[providerName],
+					level: 'private',
+				};
+			}
+		});
+		loggerStorageCategory.debug('storage vault configure called');
+		_instance.vault.configure(vaultConfig);
+	};
+	return _instance;
+};
+
+export const Storage: StorageClass = getInstance();
+Amplify.register(Storage);
 
 /**
  * @deprecated use named import
