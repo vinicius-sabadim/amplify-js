@@ -386,7 +386,7 @@ jobs:
             echo $SSH_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
             git clone $AMPLIFY_JS_SAMPLES_STAGING_URL
             cd amplify-js-samples-staging
-            git checkout next-major-version/5
+            git checkout katie/next-major-version/5
             yarn
       - save_cache:
           key: amplify-js-{{ .Branch }}-{{ checksum "amplify-js-samples-staging/yarn.lock" }}
@@ -1181,7 +1181,7 @@ jobs:
             git config --global user.name $GITHUB_USER
             git status
             git --no-pager diff
-            yarn publish:$CIRCLE_BRANCH
+            # yarn publish:$CIRCLE_BRANCH
 
   post_release:
     executor: build-executor
@@ -1214,6 +1214,7 @@ releasable_branches: &releasable_branches
       - geo/main
       - in-app-messaging/main
       - next-major-version/5
+      - 7133-storage-list-pagination-2
 
 test_browsers: &test_browsers
   browser: [chrome, firefox]
