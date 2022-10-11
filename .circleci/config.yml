@@ -387,8 +387,7 @@ jobs:
             echo $SSH_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
             git clone $AMPLIFY_JS_SAMPLES_STAGING_URL
             cd amplify-js-samples-staging
-          ## TODO - remove next line before merging to main
-            git checkout rn-upgrade-integ-test-2
+            git checkout katie_rn_storage_upgrade
             yarn
       - save_cache:
           key: amplify-js-{{ .Branch }}-{{ checksum "amplify-js-samples-staging/yarn.lock" }}
