@@ -253,7 +253,7 @@ commands:
       - run:
           name: Create avd
           command: |
-            SYSTEM_IMAGES="system-images;android-31;default;x86_64"
+            SYSTEM_IMAGES="system-images;android-29;default;x86_64"
             sdkmanager "$SYSTEM_IMAGES"
             echo "no" | avdmanager --verbose create avd -n test -k "$SYSTEM_IMAGES"
       - run:
@@ -268,7 +268,6 @@ commands:
             shasum | awk '{print $1}' > /tmp/gradle_cache_seed
       - run:
           name: Yarn Install
-          # command: yarn install --frozen-lockfile --non-interactive
           command: |
             echo "Current NPM registry: " $(yarn config get registry)
             ~/amplify-js/.circleci/retry-yarn-script.sh -s 'install --frozen-lockfile --non-interactive' -n 3
@@ -281,7 +280,7 @@ commands:
           command: npm i -g detox-cli
       - run:
           name: Detox Build
-          command: detox build -c android.emu.debug
+          command: detox build -c android.emu.release
       - run:
           name: Wait for emulator to start
           command: |
@@ -300,7 +299,7 @@ commands:
             JEST_JUNIT_OUTPUT_NAME: 'detox-test-results.xml'
           name: Detox Test
           command: |
-            detox test -c android.emu.debug -u
+            ~/amplify-js/.circleci/retry-yarn-script.sh -s 'detox test -c android.emu.release -u' -n 3
       - store_test_results:
           path: reports/junit
       - store_artifacts:
