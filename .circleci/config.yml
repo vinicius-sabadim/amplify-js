@@ -335,9 +335,10 @@ jobs:
       - run:
           name: yarn install --non-interactive
           # temporarily rename .yarnrc before installing so that we can generate a yarn.lock artifact
+          # TODO: upgrade image with newer Node.js and remove --ignore-engines
           command: |
             mv .yarnrc ._yarnrc
-            yarn
+            yarn --ignore-engines
       - run: yarn bootstrap
       - run: yarn build
       # storing yarn.lock as an artifact, so that we can quickly get a dependency diff
@@ -1227,9 +1228,6 @@ jobs:
           browser: << parameters.browser >>
 
   integ_react_iot_reconnect:
-    parameters:
-      browser:
-        type: string
     executor: js-test-executor
     <<: *test_env_vars
     working_directory: ~/amplify-js-samples-staging/samples/react/pubsub/reconnection-iot
@@ -1245,9 +1243,6 @@ jobs:
           browser: chrome
 
   integ_react_api_reconnect:
-    parameters:
-      browser:
-        type: string
     executor: js-test-executor
     <<: *test_env_vars
     working_directory: ~/amplify-js-samples-staging/samples/react/pubsub/reconnection-api
@@ -1763,18 +1758,12 @@ workflows:
             - build
           filters:
             <<: *releasable_branches
-          matrix:
-            parameters:
-              <<: *test_browsers
       - integ_react_api_reconnect:
           requires:
             - integ_setup
             - build
           filters:
             <<: *releasable_branches
-          matrix:
-            parameters:
-              <<: *test_browsers
 
       - deploy:
           filters:
