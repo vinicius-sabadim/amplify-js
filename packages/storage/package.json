@@ -60,6 +60,7 @@
           "pathRegex": "(/__tests__/.*|\\.(test|spec))\\.(tsx?|jsx?)$"
         },
         "tsConfig": {
+					"baseUrl": ".",
           "lib": [
             "es5",
             "es2015",
