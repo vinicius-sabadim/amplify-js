@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-		"baseUrl": ".",
 		"paths": {
 			"@aws-amplify/*": ["./packages/*/src"]
 		}
