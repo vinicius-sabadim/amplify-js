@@ -2,7 +2,10 @@ module.exports = {
 	entry: {
 		'aws-amplify-interactions.min': './lib-esm/index.js',
 	},
-	externals: ['aws-sdk/clients/lexruntime', { '@aws-amplify/core': 'aws_amplify_core' }],
+	externals: [
+		'aws-sdk/clients/lexruntime',
+		{ '@aws-amplify/core': 'aws_amplify_core' },
+	],
 	output: {
 		filename: '[name].js',
 		path: __dirname + '/dist',
@@ -32,6 +35,10 @@ module.exports = {
 						loader: 'babel-loader',
 						options: {
 							presets: ['@babel/preset-env'],
+							plugins: [
+								'@babel/plugin-proposal-nullish-coalescing-operator',
+								'@babel/plugin-proposal-optional-chaining',
+							],
 						},
 					},
 				],

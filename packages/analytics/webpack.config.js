@@ -6,7 +6,7 @@ module.exports = {
 		'react-native',
 		{
 			'@aws-amplify/cache': 'aws_amplify_cache',
-			'@aws-amplify/core': 'aws_amplify_core'
+			'@aws-amplify/core': 'aws_amplify_core',
 		},
 		'aws-sdk/clients/pinpoint',
 		'aws-sdk/clients/kinesis',
@@ -41,6 +41,10 @@ module.exports = {
 						loader: 'babel-loader',
 						options: {
 							presets: ['@babel/preset-env'],
+							plugins: [
+								'@babel/plugin-proposal-nullish-coalescing-operator',
+								'@babel/plugin-proposal-optional-chaining',
+							],
 						},
 					},
 				],

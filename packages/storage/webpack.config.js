@@ -2,7 +2,10 @@ module.exports = {
 	entry: {
 		'aws-amplify-storage.min': './lib-esm/index.js',
 	},
-	externals: [{ '@aws-amplify/core': 'aws_amplify_core' }, 'aws-sdk/clients/s3'],
+	externals: [
+		{ '@aws-amplify/core': 'aws_amplify_core' },
+		'aws-sdk/clients/s3',
+	],
 	output: {
 		filename: '[name].js',
 		path: __dirname + '/dist',
@@ -32,6 +35,10 @@ module.exports = {
 						loader: 'babel-loader',
 						options: {
 							presets: ['@babel/preset-env'],
+							plugins: [
+								'@babel/plugin-proposal-nullish-coalescing-operator',
+								'@babel/plugin-proposal-optional-chaining',
+							],
 						},
 					},
 				],

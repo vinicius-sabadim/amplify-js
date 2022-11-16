@@ -31,7 +31,18 @@ module.exports = {
 					{
 						loader: 'babel-loader',
 						options: {
-							presets: ['@babel/preset-env'],
+							presets: [
+								[
+									'@babel/preset-env',
+									{
+										targets: { chrome: '100' },
+									},
+								],
+							],
+							plugins: [
+								'@babel/plugin-proposal-nullish-coalescing-operator',
+								'@babel/plugin-proposal-optional-chaining',
+							],
 						},
 					},
 				],
