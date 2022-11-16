@@ -55,16 +55,7 @@
     "globals": {
       "ts-jest": {
         "diagnostics": true,
-        "tsConfig": {
-          "lib": [
-            "es5",
-            "es2015",
-            "dom",
-            "esnext.asynciterable",
-            "es2017.object"
-          ],
-          "allowJs": true
-        }
+        "tsConfig": false
       }
     },
     "transform": {
