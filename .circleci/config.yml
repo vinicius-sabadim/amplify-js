@@ -1330,7 +1330,7 @@ releasable_branches: &releasable_branches
       - geo/main
       - in-app-messaging/main
       - next-major-version/5
-      - bump-aws-sdk-3.175.0
+      - feat/bump-aws-sdk
 
 test_browsers: &test_browsers
   browser: [chrome, firefox]
