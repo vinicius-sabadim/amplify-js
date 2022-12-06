@@ -995,6 +995,7 @@ jobs:
           sample_name: delete-user
           spec: delete-user
           browser: << parameters.browser >>
+
   integ_rn_ios_storage:
     executor: macos-executor
     <<: *test_env_vars
@@ -1034,6 +1035,13 @@ jobs:
     executor: macos-executor
     <<: *test_env_vars
     working_directory: ~/amplify-js-samples-staging/samples/react-native/datastore/SQLiteAdapter
+    steps:
+      - integ_test_rn_ios
+
+  integ_rn_ios_device_tracking:
+    executor: macos-executor
+    <<: *test_env_vars
+    working_directory: ~/amplify-js-samples-staging/samples/react-native/auth/deviceTracking
     steps:
       - integ_test_rn_ios
 
