@@ -16,6 +16,7 @@ import CognitoUserSession from './CognitoUserSession';
 import DateHelper from './DateHelper';
 import CognitoUserAttribute from './CognitoUserAttribute';
 import StorageHelper from './StorageHelper';
+import { ConsoleLogger as Logger } from '@aws-amplify/core';
 
 /**
  * @callback nodeCallback
@@ -62,6 +63,8 @@ const userAgent = isNavigatorAvailable
 		? 'react-native'
 		: navigator.userAgent
 	: 'nodejs';
+const logger = new Logger('CognitoUser');
+logger.debug('userAgent ', userAgent);
 
 /** @class */
 export default class CognitoUser {
