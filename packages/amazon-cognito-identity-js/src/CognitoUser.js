@@ -64,7 +64,6 @@ const userAgent = isNavigatorAvailable
 		: navigator.userAgent
 	: 'nodejs';
 const logger = new Logger('CognitoUser');
-logger.debug('userAgent ', userAgent);
 
 /** @class */
 export default class CognitoUser {
@@ -539,6 +538,8 @@ export default class CognitoUser {
 				this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
 				this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
 				this.randomPassword = authenticationHelper.getRandomPassword();
+
+				logger.debug('userAgent ', userAgent);
 
 				this.client.request(
 					'ConfirmDevice',
