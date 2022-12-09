@@ -16,7 +16,6 @@ import CognitoUserSession from './CognitoUserSession';
 import DateHelper from './DateHelper';
 import CognitoUserAttribute from './CognitoUserAttribute';
 import StorageHelper from './StorageHelper';
-import { ConsoleLogger as Logger } from '@aws-amplify/core';
 
 /**
  * @callback nodeCallback
@@ -63,7 +62,6 @@ const userAgent = isNavigatorAvailable
 		? 'react-native'
 		: navigator.userAgent
 	: 'nodejs';
-const logger = new Logger('CognitoUser');
 
 /** @class */
 export default class CognitoUser {
@@ -538,8 +536,6 @@ export default class CognitoUser {
 				this.verifierDevices = deviceSecretVerifierConfig.PasswordVerifier;
 				this.deviceGroupKey = newDeviceMetadata.DeviceGroupKey;
 				this.randomPassword = authenticationHelper.getRandomPassword();
-
-				logger.debug('userAgent ', userAgent);
 
 				this.client.request(
 					'ConfirmDevice',
