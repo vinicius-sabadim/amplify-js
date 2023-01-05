@@ -30,6 +30,8 @@ import {
 	MtmJoin,
 	DefaultPKHasOneParent,
 	DefaultPKHasOneChild,
+	CompositeDog,
+	CompositeOwner,
 } from './helpers';
 
 export { pause };
@@ -382,6 +384,8 @@ export function addCommonQueryTests({
 		let HasOneChild: PersistentModelConstructor<HasOneChild>;
 		let DefaultPKHasOneParent: PersistentModelConstructor<DefaultPKHasOneParent>;
 		let DefaultPKHasOneChild: PersistentModelConstructor<DefaultPKHasOneChild>;
+		let CompositeDog: PersistentModelConstructor<CompositeDog>;
+		let CompositeOwner: PersistentModelConstructor<CompositeOwner>;
 
 		beforeEach(async () => {
 			const classes = initSchema(testSchema());
@@ -392,6 +396,8 @@ export function addCommonQueryTests({
 				HasOneChild,
 				DefaultPKHasOneParent,
 				DefaultPKHasOneChild,
+				CompositeDog,
+				CompositeOwner,
 			} = classes as {
 				Comment: PersistentModelConstructor<Comment>;
 				Post: PersistentModelConstructor<Post>;
@@ -399,6 +405,8 @@ export function addCommonQueryTests({
 				HasOneChild: PersistentModelConstructor<HasOneChild>;
 				DefaultPKHasOneParent: PersistentModelConstructor<DefaultPKHasOneParent>;
 				DefaultPKHasOneChild: PersistentModelConstructor<DefaultPKHasOneChild>;
+				CompositeDog: PersistentModelConstructor<CompositeDog>;
+				CompositeOwner: PersistentModelConstructor<CompositeOwner>;
 			});
 		});
 
@@ -604,6 +612,32 @@ export function addCommonQueryTests({
 				).toBeUndefined();
 			}
 		);
+
+		test.only('bidirectional hasOne-belongsTo does not aimlessly load unassociated models', async () => {
+			const dog1 = await DataStore.save(
+				new CompositeDog({
+					name: 'Dog1',
+					description: 'Dog1description',
+				})
+			);
+			const dog2 = await DataStore.save(
+				new CompositeDog({
+					name: 'Dog2',
+					description: 'Dog2description',
+				})
+			);
+			const owner1 = await DataStore.save(
+				new CompositeOwner({
+					lastName: 'Cooper',
+					firstName: 'Dale',
+				})
+			);
+			const queriedOwner1 = await DataStore.query(CompositeOwner, {
+				lastName: 'Cooper',
+				firstName: 'Dale',
+			});
+			expect(await queriedOwner1?.compositeDog).toBeUndefined();
+		});
 	});
 
 	describe('Related models', () => {
@@ -758,7 +792,7 @@ export function addCommonQueryTests({
 
 								expect(lazyLoaded).toEqual(remote);
 							});
-							test(`lazy load does load aimlessly ${testname}`, async () => {
+							test(`lazy load does not load aimlessly ${testname}`, async () => {
 								/**
 								 * Basically, we want to ensure lazy loading never regresses and starts
 								 * loading related instances that are not actually related by FK.
