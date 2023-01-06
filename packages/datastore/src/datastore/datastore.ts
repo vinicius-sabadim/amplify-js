@@ -957,12 +957,17 @@ const createModelClass = <T extends PersistentModel>(
 					: modelInstanceAssociationsMap.set(this, {}).get(this)!;
 
 				if (!instanceMemos.hasOwnProperty(field)) {
+					console.log('getting', field);
 					if (getAttachment(this) === ModelAttachment.DataStore) {
 						const resultPromise = instance.query(
 							relationship.remoteModelConstructor as PersistentModelConstructor<T>,
 							base =>
 								base.and(q => {
 									return relationship.remoteJoinFields.map((field, index) => {
+										console.log(
+											`adding remote.${field} == local.${relationship.localJoinFields[index]} to query`,
+											this[relationship.localJoinFields[index]]
+										);
 										return (q[field] as any).eq(
 											this[relationship.localJoinFields[index]]
 										);

@@ -1004,6 +1004,8 @@ export function getDataStore({ online = false, isNode = true } = {}) {
 		DefaultPKHasOneChild,
 		CompositeDog,
 		CompositeOwner,
+		BoringDog,
+		BoringOwner,
 	} = classes as {
 		ModelWithBoolean: PersistentModelConstructor<ModelWithBoolean>;
 		Post: PersistentModelConstructor<Post>;
@@ -1025,6 +1027,8 @@ export function getDataStore({ online = false, isNode = true } = {}) {
 		DefaultPKHasOneChild: PersistentModelConstructor<DefaultPKHasOneChild>;
 		CompositeDog: PersistentModelConstructor<CompositeDog>;
 		CompositeOwner: PersistentModelConstructor<CompositeOwner>;
+		BoringDog: PersistentModelConstructor<BoringDog>;
+		BoringOwner: PersistentModelConstructor<BoringOwner>;
 	};
 
 	return {
@@ -1053,6 +1057,8 @@ export function getDataStore({ online = false, isNode = true } = {}) {
 		DefaultPKHasOneChild,
 		CompositeDog,
 		CompositeOwner,
+		BoringDog,
+		BoringOwner,
 	};
 }
 
@@ -1493,6 +1499,32 @@ export declare class CompositeDog {
 	readonly updatedAt?: string | null;
 	readonly compositeDogCompositeOwnerLastName?: string | null;
 	readonly compositeDogCompositeOwnerFirstName?: string | null;
+}
+
+export declare class BoringDog {
+	readonly [__modelMeta__]: {
+		identifier: ManagedIdentifier<BoringDog, 'id'>;
+		readOnlyFields: 'createdAt' | 'updatedAt';
+	};
+	readonly id: string;
+	readonly name?: string | null;
+	readonly boringOwner: AsyncItem<BoringOwner | undefined>;
+	readonly createdAt?: string | null;
+	readonly updatedAt?: string | null;
+	readonly boringDogBoringOwnerId?: string | null;
+}
+
+export declare class BoringOwner {
+	readonly [__modelMeta__]: {
+		identifier: ManagedIdentifier<BoringOwner, 'id'>;
+		readOnlyFields: 'createdAt' | 'updatedAt';
+	};
+	readonly id: string;
+	readonly name?: string | null;
+	readonly boringDog: AsyncItem<BoringDog | undefined>;
+	readonly createdAt?: string | null;
+	readonly updatedAt?: string | null;
+	readonly boringOwnerBoringDogId?: string | null;
 }
 
 export declare class ImplicitChild {
@@ -2445,7 +2477,8 @@ export function testSchema(): Schema {
 						attributes: [],
 						association: {
 							connectionType: 'HAS_ONE',
-							associatedWith: ['compositeOwner'],
+							// associatedWith: ['compositeOwner'],
+							associatedWith: ['name', 'description'],
 							targetNames: [
 								'compositeOwnerCompositeDogName',
 								'compositeOwnerCompositeDogDescription',
@@ -2494,6 +2527,162 @@ export function testSchema(): Schema {
 						type: 'key',
 						properties: {
 							fields: ['lastName', 'firstName'],
+						},
+					},
+				],
+			},
+			BoringDog: {
+				name: 'BoringDog',
+				fields: {
+					id: {
+						name: 'id',
+						isArray: false,
+						type: 'ID',
+						isRequired: true,
+						attributes: [],
+					},
+					name: {
+						name: 'name',
+						isArray: false,
+						type: 'String',
+						isRequired: false,
+						attributes: [],
+					},
+					boringOwner: {
+						name: 'boringOwner',
+						isArray: false,
+						type: {
+							model: 'BoringOwner',
+						},
+						isRequired: false,
+						attributes: [],
+						association: {
+							connectionType: 'BELONGS_TO',
+							targetNames: ['boringDogBoringOwnerId'],
+						},
+					},
+					createdAt: {
+						name: 'createdAt',
+						isArray: false,
+						type: 'AWSDateTime',
+						isRequired: false,
+						attributes: [],
+						isReadOnly: true,
+					},
+					updatedAt: {
+						name: 'updatedAt',
+						isArray: false,
+						type: 'AWSDateTime',
+						isRequired: false,
+						attributes: [],
+						isReadOnly: true,
+					},
+					boringDogBoringOwnerId: {
+						name: 'boringDogBoringOwnerId',
+						isArray: false,
+						type: 'ID',
+						isRequired: false,
+						attributes: [],
+					},
+				},
+				syncable: true,
+				pluralName: 'BoringDogs',
+				attributes: [
+					{
+						type: 'model',
+						properties: {},
+					},
+					{
+						type: 'auth',
+						properties: {
+							rules: [
+								{
+									provider: 'userPools',
+									ownerField: 'owner',
+									allow: 'owner',
+									identityClaim: 'cognito:username',
+									operations: ['create', 'update', 'delete', 'read'],
+								},
+							],
+						},
+					},
+				],
+			},
+			BoringOwner: {
+				name: 'BoringOwner',
+				fields: {
+					id: {
+						name: 'id',
+						isArray: false,
+						type: 'ID',
+						isRequired: true,
+						attributes: [],
+					},
+					name: {
+						name: 'name',
+						isArray: false,
+						type: 'String',
+						isRequired: false,
+						attributes: [],
+					},
+					boringDog: {
+						name: 'boringDog',
+						isArray: false,
+						type: {
+							model: 'BoringDog',
+						},
+						isRequired: false,
+						attributes: [],
+						association: {
+							connectionType: 'HAS_ONE',
+							// associatedWith: ['boringOwner'],
+							associatedWith: ['id'],
+							targetNames: ['boringOwnerBoringDogId'],
+						},
+					},
+					createdAt: {
+						name: 'createdAt',
+						isArray: false,
+						type: 'AWSDateTime',
+						isRequired: false,
+						attributes: [],
+						isReadOnly: true,
+					},
+					updatedAt: {
+						name: 'updatedAt',
+						isArray: false,
+						type: 'AWSDateTime',
+						isRequired: false,
+						attributes: [],
+						isReadOnly: true,
+					},
+					boringOwnerBoringDogId: {
+						name: 'boringOwnerBoringDogId',
+						isArray: false,
+						type: 'ID',
+						isRequired: false,
+						attributes: [],
+					},
+				},
+				syncable: true,
+				pluralName: 'BoringOwners',
+				attributes: [
+					{
+						type: 'model',
+						properties: {},
+					},
+					{
+						type: 'auth',
+						properties: {
+							rules: [
+								{
+									provider: 'userPools',
+									ownerField: 'owner',
+									allow: 'owner',
+									identityClaim: 'cognito:username',
+									operations: ['create', 'update', 'delete', 'read'],
+								},
+							],
 						},
 					},
 				],

@@ -32,6 +32,8 @@ import {
 	DefaultPKHasOneChild,
 	CompositeDog,
 	CompositeOwner,
+	BoringDog,
+	BoringOwner,
 } from './helpers';
 
 export { pause };
@@ -386,6 +388,8 @@ export function addCommonQueryTests({
 		let DefaultPKHasOneChild: PersistentModelConstructor<DefaultPKHasOneChild>;
 		let CompositeDog: PersistentModelConstructor<CompositeDog>;
 		let CompositeOwner: PersistentModelConstructor<CompositeOwner>;
+		let BoringDog: PersistentModelConstructor<BoringDog>;
+		let BoringOwner: PersistentModelConstructor<BoringOwner>;
 
 		beforeEach(async () => {
 			const classes = initSchema(testSchema());
@@ -398,6 +402,8 @@ export function addCommonQueryTests({
 				DefaultPKHasOneChild,
 				CompositeDog,
 				CompositeOwner,
+				BoringDog,
+				BoringOwner,
 			} = classes as {
 				Comment: PersistentModelConstructor<Comment>;
 				Post: PersistentModelConstructor<Post>;
@@ -407,6 +413,8 @@ export function addCommonQueryTests({
 				DefaultPKHasOneChild: PersistentModelConstructor<DefaultPKHasOneChild>;
 				CompositeDog: PersistentModelConstructor<CompositeDog>;
 				CompositeOwner: PersistentModelConstructor<CompositeOwner>;
+				BoringDog: PersistentModelConstructor<BoringDog>;
+				BoringOwner: PersistentModelConstructor<BoringOwner>;
 			});
 		});
 
@@ -613,7 +621,62 @@ export function addCommonQueryTests({
 			}
 		);
 
-		test.only('bidirectional hasOne-belongsTo does not aimlessly load unassociated models', async () => {
+		test.only('bidirectional hasOne-belongsTo does not aimlessly load unassociated models (single decoy)', async () => {
+			const dog1 = await DataStore.save(
+				new BoringDog({
+					name: 'a boring dog',
+				})
+			);
+			const owner1 = await DataStore.save(
+				new BoringOwner({
+					name: 'a boring owner',
+				})
+			);
+			const queriedOwner1 = await DataStore.query(BoringOwner, owner1.id);
+			expect(await queriedOwner1?.boringDog).toBeUndefined();
+		});
+
+		test.only('bidirectional hasOne-belongsTo does not aimlessly load unassociated models (many decoys)', async () => {
+			const dog1 = await DataStore.save(
+				new BoringDog({
+					name: 'Dog1',
+				})
+			);
+			const dog2 = await DataStore.save(
+				new BoringDog({
+					name: 'Dog2',
+				})
+			);
+			const owner1 = await DataStore.save(
+				new BoringOwner({
+					name: 'owner 1',
+				})
+			);
+			const queriedOwner1 = await DataStore.query(BoringOwner, owner1.id);
+			expect(await queriedOwner1?.boringDog).toBeUndefined();
+		});
+
+		test.only('bidirectional CPK hasOne-belongsTo does not aimlessly load unassociated models (single decoy)', async () => {
+			const dog1 = await DataStore.save(
+				new CompositeDog({
+					name: 'Dog1',
+					description: 'Dog1description',
+				})
+			);
+			const owner1 = await DataStore.save(
+				new CompositeOwner({
+					lastName: 'Cooper',
+					firstName: 'Dale',
+				})
+			);
+			const queriedOwner1 = await DataStore.query(CompositeOwner, {
+				lastName: 'Cooper',
+				firstName: 'Dale',
+			});
+			expect(await queriedOwner1?.compositeDog).toBeUndefined();
+		});
+
+		test.only('bidirectional CPK hasOne-belongsTo does not aimlessly load unassociated models (many decoys)', async () => {
 			const dog1 = await DataStore.save(
 				new CompositeDog({
 					name: 'Dog1',
