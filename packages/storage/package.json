@@ -33,6 +33,16 @@
     "type": "git",
     "url": "https://github.com/aws-amplify/amplify-js.git"
   },
+  "exports": {
+    ".": {
+      "import": "./lib-esm/index.js",
+      "require": "./lib/index.js"
+    },
+    "./s3": {
+      "import": "./lib-esm/s3/index.js",
+      "require": "./lib/s3/index.js"
+    }
+  },
   "author": "Amazon Web Services",
   "license": "Apache-2.0",
   "bugs": {
