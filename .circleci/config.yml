@@ -370,13 +370,13 @@ jobs:
           paths:
             - amplify-js
 
-  webkit_setup:
-    executor: build-executor
-    steps:
-      - checkout
-      - run: npx playwright install
-      - run: npx playwright install webkit
-      - run: npx playwright install-deps webkit 
+  # webkit_setup:
+  #   executor: build-executor
+  #   steps:
+  #     - checkout
+  #     - run: npx playwright install
+  #     - run: npx playwright install webkit
+  #     - run: npx playwright install-deps webkit 
 
   unit_test:
     executor: unit-test-executor
@@ -409,6 +409,7 @@ jobs:
             echo $SSH_HOST_PUBLIC_KEY >> ~/.ssh/known_hosts
             git clone $AMPLIFY_JS_SAMPLES_STAGING_URL
             cd amplify-js-samples-staging
+            git checkout webkit-support
             branchExists=true
             git ls-remote --heads origin <<pipeline.git.branch>> | grep <<pipeline.git.branch>> >/dev/null || branchExists=false
             if [ "$branchExists" = true ]; then git checkout <<pipeline.git.branch>>; fi
@@ -1479,7 +1480,7 @@ jobs:
             git config --global user.name $GITHUB_USER
             git status
             git --no-pager diff
-            yarn publish:$CIRCLE_BRANCH
+            # yarn publish:$CIRCLE_BRANCH
 
   post_release:
     executor: build-executor
@@ -1517,6 +1518,7 @@ releasable_branches: &releasable_branches
       - 1.0-stable
       - geo/main
       - in-app-messaging/main
+      - test-webkit-setup-config
 
 test_browsers: &test_browsers
   browser: [chrome, firefox]
@@ -1558,9 +1560,9 @@ workflows:
       - unit_test:
           requires:
             - build
-      - webkit_setup:
-          requires:
-            - integ_setup
+      # - webkit_setup:
+      #     requires:
+      #       - integ_setup
       - bundle_test:
           requires:
             - build
@@ -1981,7 +1983,7 @@ workflows:
       - integ_react_datastore_custom_pk_unconnected_models_webkit:
           requires:
             - integ_setup
-            - webkit_setup
+            # - webkit_setup
             - build
           filters:
             <<: *releasable_branches
@@ -2018,7 +2020,7 @@ workflows:
       - integ_react_datastore_background_process_manager_webkit:
           requires:
             - integ_setup
-            - webkit_setup
+            # - webkit_setup
             - build
           filters:
             <<: *releasable_branches
