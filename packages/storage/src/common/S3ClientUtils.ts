@@ -133,8 +133,10 @@ export const createS3Client = (
 		dangerouslyConnectToHttpEndpointForTesting?: boolean;
 		useAccelerateEndpoint?: boolean;
 	},
-	emitter?: events.EventEmitter
+	emitter?: events.EventEmitter,
+	customCredentialSource?: any
 ): S3Client => {
+	const credentialSource = customCredentialSource || credentialsProvider;
 	const {
 		region,
 		cancelTokenSource,
@@ -156,7 +158,7 @@ export const createS3Client = (
 		region,
 		// Using provider instead of a static credentials, so that if an upload task was in progress, but credentials gets
 		// changed or invalidated (e.g user signed out), the subsequent requests will fail.
-		credentials: credentialsProvider,
+		credentials: credentialSource,
 		customUserAgent: getAmplifyUserAgent(),
 		...localTestingConfig,
 		requestHandler: new AxiosHttpHandler({}, emitter, cancelTokenSource),

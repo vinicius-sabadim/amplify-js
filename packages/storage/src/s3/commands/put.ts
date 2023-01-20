@@ -1,6 +1,14 @@
 import { Amplify, parseAWSExports } from '@aws-amplify/core';
-import { PutObjectCommandInput } from '@aws-sdk/client-s3';
+import { PutObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3';
+import * as events from 'events';
+import {
+	createS3Client,
+	DEFAULT_PART_SIZE,
+	createPrefixMiddleware,
+	prefixMiddlewareOptions,
+} from '../../common/S3ClientUtils';
 import { S3ProviderPutConfig } from '../../types';
+import { byteLength, validateAndSanitizeBody } from '../utils';
 
 export const put = (
 	key: string,
@@ -55,12 +63,32 @@ export const put = (
 		SSEKMSKeyId: SSEKMSKeyId,
 	};
 
-	// Initialize the upload client
+	// Initialize new upload client
+	// TODO Investigate sharing client between APIs & impact to tree-shaking
+	const emitter = new events.EventEmitter();
+	const s3client = createS3Client(options, emitter); // TODO Swap out credential provider
+
+	// Setup client middleware
+	s3client.middlewareStack.add(
+		createPrefixMiddleware(options, key),
+		prefixMiddlewareOptions
+	);
 
 	// Upload file
-	// TODO Handle multi-part uploads
-	// TODO Handle resumable uploads
-	// TODO Support for progress callback
+	const sanitizedBody = validateAndSanitizeBody(putParams.Body);
+	const fileSize = byteLength(sanitizedBody);
+
+	if (fileSize <= DEFAULT_PART_SIZE) {
+		putParams.Body = sanitizedBody;
+		const putObjectCommand = new PutObjectCommand(putParams);
+		console.log('putObjectCommand', putObjectCommand);
+		return s3client.send(putObjectCommand);
+
+		// TODO Handle resumable uploads
+		// TODO Add progress callback
+	} else {
+		// TODO Hand multi-part uploads. Should this be broken into it's own API for tree-shaking? Use existing class or refactor?
+	}
 
 	return Promise.resolve(true);
 };
