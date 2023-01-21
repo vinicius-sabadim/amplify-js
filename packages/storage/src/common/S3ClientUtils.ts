@@ -137,6 +137,14 @@ export const createS3Client = (
 	customCredentialSource?: any
 ): S3Client => {
 	const credentialSource = customCredentialSource || credentialsProvider;
+
+	const testCreds = async () => {
+		const creds = await credentialSource();
+
+		console.log('+ creds', creds);
+	};
+	testCreds();
+
 	const {
 		region,
 		cancelTokenSource,
