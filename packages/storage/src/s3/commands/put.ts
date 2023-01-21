@@ -1,46 +1,23 @@
-import { Amplify, parseAWSExports } from '@aws-amplify/core';
 import {
 	PutObjectCommand,
 	PutObjectCommandInput,
 	S3Client,
 } from '@aws-sdk/client-s3';
-import * as events from 'events';
-import {
-	createS3Client,
-	DEFAULT_PART_SIZE,
-	createPrefixMiddleware,
-	prefixMiddlewareOptions,
-} from '../../common/S3ClientUtils';
+import { DEFAULT_PART_SIZE } from '../../common/S3ClientUtils';
 import { S3ProviderPutConfig } from '../../types';
-import { byteLength, validateAndSanitizeBody } from '../utils';
+import {
+	byteLength,
+	validateAndSanitizeBody,
+	getStorageConfig,
+} from '../utils';
 
-export const createSDKClient = (key: string, options: any): S3Client => {
-	const emitter = new events.EventEmitter();
-
-	// TODO Investigate sharing client between APIs & impact to tree-shaking
-	const s3client = createS3Client(options, emitter); // TODO Swap out credential provider
-
-	// Setup client middleware
-	s3client.middlewareStack.add(
-		createPrefixMiddleware(options, key),
-		prefixMiddlewareOptions
-	);
-
-	return s3client;
-};
-
-export const put = (
+export const put = async (
 	key: string,
 	object: any,
 	config?: S3ProviderPutConfig,
-	sdkClientCreator?: (key: string, options: any) => S3Client // S3 client escape hatch
+	sdkClientCreator?: (key: string, options: any) => Promise<S3Client> // S3 client escape hatch
 ): Promise<any> => {
-	const amplifyConfig = parseAWSExports(Amplify.getConfig()) as any;
-	const s3GlobalConfig = amplifyConfig?.Storage.AWSS3;
-
-	if (!s3GlobalConfig) {
-		throw Error('S3 has not been configured.');
-	}
+	const s3GlobalConfig = getStorageConfig();
 
 	// Build request options & S3 command
 	const options = Object.assign({}, s3GlobalConfig, config);
@@ -99,7 +76,7 @@ export const put = (
 
 	// Check if customer wants to use SDK escape hatch
 	if (sdkClientCreator) {
-		const s3Client = sdkClientCreator(key, options);
+		const s3Client = await sdkClientCreator(key, options);
 
 		return s3Client.send(putObjectCommand);
 	} else {

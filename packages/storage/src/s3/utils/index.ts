@@ -1,4 +1,42 @@
-import { MAX_OBJECT_SIZE } from '../../common/S3ClientUtils';
+import { Amplify, parseAWSExports } from '@aws-amplify/core';
+import { S3Client } from '@aws-sdk/client-s3';
+import * as events from 'events';
+import {
+	createS3Client,
+	MAX_OBJECT_SIZE,
+	createPrefixMiddleware,
+	prefixMiddlewareOptions,
+} from '../../common/S3ClientUtils';
+
+export const createSDKClient = async (
+	key: string,
+	options: any
+): Promise<S3Client> => {
+	const emitter = new events.EventEmitter();
+
+	// TODO Investigate sharing client between APIs & impact to tree-shaking
+	const s3client = createS3Client(options, emitter); // TODO Swap out credential provider
+
+	// Setup client middleware
+	// TODO Standardize prefix generation between APIS
+	s3client.middlewareStack.add(
+		createPrefixMiddleware(options, key),
+		prefixMiddlewareOptions
+	);
+
+	return s3client;
+};
+
+export const getStorageConfig = () => {
+	const amplifyConfig = parseAWSExports(Amplify.getConfig()) as any;
+	const s3GlobalConfig = amplifyConfig?.Storage.AWSS3;
+
+	if (!s3GlobalConfig) {
+		throw Error('S3 has not been configured.');
+	}
+
+	return s3GlobalConfig;
+};
 
 export const byteLength = (input: any) => {
 	if (input === null || input === undefined) return 0;
