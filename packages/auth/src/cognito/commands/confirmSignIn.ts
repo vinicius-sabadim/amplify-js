@@ -2,26 +2,36 @@ import { Amplify, parseAWSExports } from '@aws-amplify/core';
 import { requestCognitoUserPool } from '../client';
 import { cacheTokens } from '../storage';
 
-export async function signInWithUserPassword({ username, password }) {
+export async function confirmSignIn({ code }) {
 	const amplifyConfig = parseAWSExports(Amplify.getConfig()) as any;
+	const context = Amplify.getContext();
+
 	if (amplifyConfig && amplifyConfig.Auth) {
+		let Session = '';
+		let username = '';
+
+		if (context.Auth && context.Auth.confirmSignIn) {
+			Session = context.Auth.confirmSignIn.Session;
+			username = context.Auth.confirmSignIn.username;
+		}
 		const clientId = amplifyConfig.Auth.userPoolWebClientId;
+		const challengeName = context.Auth.confirmSignIn.challengeName;
 		const jsonReq = {
 			ClientId: clientId,
-			AuthFlow: 'USER_PASSWORD_AUTH',
-			AuthParameters: {
+			ValidationData: null,
+			ChallengeResponses: {
 				USERNAME: username,
-				PASSWORD: password,
+				[`${challengeName}_CODE`]: code,
 			},
+			ChallengeName: challengeName,
+			Session,
 		};
 
-		const response = await requestCognitoUserPool({
-			operation: 'InitiateAuth',
-			region: amplifyConfig.Auth.region,
+		const { AuthenticationResult } = await requestCognitoUserPool({
+			operation: 'RespondToAuthChallenge',
 			params: jsonReq,
+			region: amplifyConfig.Auth.region,
 		});
-
-		const { AuthenticationResult } = response;
 
 		cacheTokens({
 			idToken: AuthenticationResult.IdToken,
