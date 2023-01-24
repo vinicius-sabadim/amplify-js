@@ -59,6 +59,7 @@
 		"typings.d.ts"
 	],
 	"dependencies": {
+		"@aws-amplify/core": "file:../auth",
 		"@aws-crypto/sha256-js": "1.2.2",
 		"@aws-sdk/client-cloudwatch-logs": "3.6.1",
 		"@aws-sdk/client-cognito-identity": "3.6.1",
