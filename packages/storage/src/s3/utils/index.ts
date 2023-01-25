@@ -1,5 +1,4 @@
 import { Amplify, parseAWSExports } from '@aws-amplify/core';
-import { S3Client } from '@aws-sdk/client-s3';
 import * as events from 'events';
 import {
 	createS3Client,
@@ -11,7 +10,7 @@ import {
 export const createSDKClient = async (
 	key: string,
 	options: any
-): Promise<S3Client> => {
+): Promise<any> => {
 	const emitter = new events.EventEmitter();
 
 	// TODO Investigate sharing client between APIs & impact to tree-shaking

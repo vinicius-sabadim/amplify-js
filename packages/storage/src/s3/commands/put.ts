@@ -1,8 +1,4 @@
-import {
-	PutObjectCommand,
-	PutObjectCommandInput,
-	S3Client,
-} from '@aws-sdk/client-s3';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { DEFAULT_PART_SIZE } from '../../common/S3ClientUtils';
 import { S3ProviderPutConfig } from '../../types';
 import {
@@ -10,12 +6,16 @@ import {
 	validateAndSanitizeBody,
 	getStorageConfig,
 } from '../utils';
+// TODO Why is this import broken?
+//import { fetchCredentials } from '@aws-amplify/auth/cognito';
+import { generatePresignedUrl } from '../client';
 
 export const put = async (
 	key: string,
 	object: any,
+	awsCreds: any,
 	config?: S3ProviderPutConfig,
-	sdkClientCreator?: (key: string, options: any) => Promise<S3Client> // S3 client escape hatch
+	sdkClientCreator?: (key: string, options: any) => Promise<any> // S3 client escape hatch
 ): Promise<any> => {
 	const s3GlobalConfig = getStorageConfig();
 
@@ -40,9 +40,10 @@ export const put = async (
 		SSECustomerKey,
 		SSECustomerKeyMD5,
 		SSEKMSKeyId,
+		region,
 	} = options;
 
-	const putParams: PutObjectCommandInput = {
+	const putParams = {
 		Bucket: bucket,
 		Key: key,
 		Body: object,
@@ -63,10 +64,8 @@ export const put = async (
 	// Construct request
 	const sanitizedBody = validateAndSanitizeBody(putParams.Body);
 	const fileSize = byteLength(sanitizedBody);
-	let putObjectCommand;
 	if (fileSize <= DEFAULT_PART_SIZE) {
 		putParams.Body = sanitizedBody;
-		putObjectCommand = new PutObjectCommand(putParams);
 
 		// TODO Handle resumable uploads
 		// TODO Add progress callback
@@ -76,12 +75,28 @@ export const put = async (
 
 	// Check if customer wants to use SDK escape hatch
 	if (sdkClientCreator) {
-		const s3Client = await sdkClientCreator(key, options);
-
-		return s3Client.send(putObjectCommand);
+		//const putObjectCommand = new PutObjectCommand(putParams);
+		//const s3Client = await sdkClientCreator(key, options);
+		//return s3Client.send(putObjectCommand);
 	} else {
-		// Execute request with slim client
-	}
+		const path = `https://${bucket}.s3.${region}.amazonaws.com/public/${key}`;
+		const presignedUrl = await generatePresignedUrl(
+			path,
+			region,
+			awsCreds,
+			'PUT'
+		);
 
-	return Promise.resolve(true);
+		const results = await fetch(presignedUrl, {
+			method: 'PUT',
+			body: sanitizedBody,
+			headers: {
+				'Content-Length': fileSize,
+			},
+		});
+
+		console.log('+ S3 put', results);
+
+		return results;
+	}
 };
