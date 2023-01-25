@@ -35,9 +35,9 @@ export async function fetchCredentials(token: string) {
 
 		console.log({ responseCreds });
 		return {
-			accessKey: responseCreds.AccessKeyId,
-			secretKey: responseCreds.SecretKey,
-			sessionToken: responseCreds.SessionToken,
+			accessKey: responseCreds.Credentials.AccessKeyId,
+			secretKey: responseCreds.Credentials.SecretKey,
+			sessionToken: responseCreds.Credentials.SessionToken,
 			identityId: responseId.IdentityId,
 		};
 	} else {
