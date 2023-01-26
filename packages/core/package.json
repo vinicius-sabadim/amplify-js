@@ -99,6 +99,12 @@
 			"path": "./lib-esm/index.js",
 			"import": "{ Credentials }",
 			"limit": "34.5 kB"
+		},
+		{
+			"name": "Custom SDK client base",
+			"path": "./lib-esm/sdks/client.js",
+			"import": "{ authorizedClient }",
+			"limit": "4 kB"
 		}
 	],
 	"jest": {

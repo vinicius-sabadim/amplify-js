@@ -1,16 +1,16 @@
-import {} from '@aws-sdk/signature-v4';
+import { SignatureV4 } from '@aws-sdk/signature-v4';
 import { HttpRequest, HttpResponse } from '@aws-sdk/types';
 
 import {
 	Machine,
-	MachineEvent,
 	MachineManager,
 } from '@aws-amplify/auth/lib-esm/stateMachine';
 
 type ClientStates =
-	| 'config'
-	| 'serialization'
-	| 'build'
+	| 'idle'
+	| 'configured'
+	| 'serialized'
+	| 'built'
 	| 'retry'
 	| 'sign'
 	| 'send'
@@ -20,8 +20,8 @@ type ClientStates =
 
 type ClientContext = {};
 
-type StartEvent = {
-	name: 'start';
+type InputEvent = {
+	name: 'input';
 	payload: {
 		params: any;
 	};
@@ -57,7 +57,7 @@ type ResponseEvent = {
 };
 
 type ClientEvents =
-	| StartEvent
+	| InputEvent
 	| ConfigEvent
 	| RequestEvent
 	| ResponseEvent
@@ -66,12 +66,23 @@ type ClientEvents =
 export const authorizedClient = (name, serializer, deserializer, logger) => {
 	const machine = new Machine<ClientContext, ClientEvents, ClientStates>({
 		name: 'authorizedClient',
-		initial: 'config',
+		initial: 'idle',
 		context: {},
 		states: {
-			config: {},
-			serialization: {},
-			build: {},
+			idle: {
+				input: [
+					{
+						nextState: 'configured',
+						reducers: [],
+						effects: [],
+					},
+				],
+			},
+			configured: {
+				input: [],
+			},
+			serialized: {},
+			built: {},
 			retry: {},
 			sign: {},
 			send: {},
@@ -94,6 +105,7 @@ export const authorizedClient = (name, serializer, deserializer, logger) => {
 					`State machine in ${res.currentState} state; ${manager}`
 				);
 			} else {
+				// @ts-ignore
 				return res.context.result;
 			}
 		},
