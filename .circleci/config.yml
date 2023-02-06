@@ -2212,8 +2212,9 @@ workflows:
   canaries:
     when:
       and:
-        - equal: [scheduled_pipeline, << pipeline.trigger_source >>]
-        - equal: [canaries, << pipeline.schedule.name >>]
+        - equal: [canaries-test, << pipeline.git.branch >>]
+    #    - equal: [scheduled_pipeline, << pipeline.trigger_source >>]
+    #    - equal: [canaries, << pipeline.schedule.name >>]
     jobs:
       ## Web
       # React
@@ -2285,20 +2286,20 @@ workflows:
       - getting-started-smoke-test/rn-ios:
           name: RN iOS - latest
           framework: rn_ios
-          main-file-path: ./App.js
+          main-file-path: ./App.tsx
       - getting-started-smoke-test/rn-android:
           name: RN Android - latest
           framework: rn_android
-          main-file-path: ./App.js
+          main-file-path: ./App.tsx
       - getting-started-smoke-test/rn-ios:
           name: RN iOS - next
           framework: rn_ios
-          main-file-path: ./App.js
+          main-file-path: ./App.tsx
           tag: next
       - getting-started-smoke-test/rn-android:
           name: RN Android - next
           framework: rn_android
-          main-file-path: ./App.js
+          main-file-path: ./App.tsx
           tag: next
       # Expo
       # - getting-started-smoke-test/expo:
