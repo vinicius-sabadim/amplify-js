@@ -2479,7 +2479,9 @@ orbs:
 
           - run-with-retry:
               label: Pod Install
-              command: npx pod-install
+              command: |
+                brew install ios-deploy
+                npx pod-install
           - run:
               name: Call Amplify library in code
               command: |
