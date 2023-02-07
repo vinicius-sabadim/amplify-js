@@ -2448,7 +2448,7 @@ orbs:
             default: latest
           xcode-version:
             type: string
-            default: 13.4.0
+            default: 14.2.0
           ios-device:
             type: string
             default: iPhone 13
