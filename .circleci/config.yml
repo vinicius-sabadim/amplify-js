@@ -2291,11 +2291,11 @@ workflows:
           name: RN Android - latest
           framework: rn_android
           main-file-path: ./App.tsx
-      #- getting-started-smoke-test/rn-ios:
-      #    name: RN iOS - next
-      #    framework: rn_ios
-      #    main-file-path: ./App.tsx
-      #    tag: next
+      - getting-started-smoke-test/rn-ios:
+          name: RN iOS - next
+          framework: rn_ios
+          main-file-path: ./App.tsx
+          tag: next
       - getting-started-smoke-test/rn-android:
           name: RN Android - next
           framework: rn_android
@@ -2494,6 +2494,7 @@ orbs:
           - run-with-retry:
               label: Start App
               command: |
+                npm ls @react-native-community/cli
                 xcrun simctl list --json devices available
                 npm run ios
 
