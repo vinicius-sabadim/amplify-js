@@ -2493,7 +2493,9 @@ orbs:
               command: xcrun simctl boot "<< parameters.ios-device >>" || true
           - run-with-retry:
               label: Start App
-              command: npm run ios -- --verbose
+              command: |
+                xcrun simctl list --json devices available
+                npm run ios
 
       rn-android:
         parameters:
