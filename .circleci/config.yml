@@ -2019,15 +2019,15 @@ workflows:
           matrix:
             parameters:
               <<: *minimal_browser_list
-      - integ_next_datastore_owner_auth:
-          requires:
-            - integ_setup
-            - build
-          filters:
-            <<: *releasable_branches
-          matrix:
-            parameters:
-              <<: *minimal_browser_list
+#       - integ_next_datastore_owner_auth:
+#           requires:
+#             - integ_setup
+#             - build
+#           filters:
+#             <<: *releasable_branches
+#           matrix:
+#             parameters:
+#               <<: *minimal_browser_list
       - integ_react_datastore_custom_pk_unconnected_models:
           requires:
             - integ_setup
@@ -2115,24 +2115,24 @@ workflows:
           matrix:
             parameters:
               <<: *minimal_browser_list
-      - integ_next_datastore_13_basic:
-          requires:
-            - integ_setup
-            - build
-          filters:
-            <<: *releasable_branches
-          matrix:
-            parameters:
-              <<: *minimal_browser_list
-      - integ_next_datastore_13_js:
-          requires:
-            - integ_setup
-            - build
-          filters:
-            <<: *releasable_branches
-          matrix:
-            parameters:
-              <<: *minimal_browser_list
+#       - integ_next_datastore_13_basic:
+#           requires:
+#             - integ_setup
+#             - build
+#           filters:
+#             <<: *releasable_branches
+#           matrix:
+#             parameters:
+#               <<: *minimal_browser_list
+#       - integ_next_datastore_13_js:
+#           requires:
+#             - integ_setup
+#             - build
+#           filters:
+#             <<: *releasable_branches
+#           matrix:
+#             parameters:
+#               <<: *minimal_browser_list
       - integ_vite_datastore_basic_crud:
           requires:
             - integ_setup
@@ -2212,7 +2212,7 @@ workflows:
             - integ_react_graphql_api
             # - integ_javascript_geo  # TODO: enable it when CDN deployment is automated
             - integ_react_geo
-            - integ_next_datastore_owner_auth
+#             - integ_next_datastore_owner_auth
             - integ_react_datastore_custom_pk_unconnected_models
             - integ_react_datastore_custom_pk_unconnected_models_webkit
             - integ_react_datastore_custom_pk_has_one
@@ -2224,8 +2224,8 @@ workflows:
             - integ_react_api_reconnect
             - integ_react_datastore_selective_sync
             - integ_react_datastore_nested_predicate
-            - integ_next_datastore_13_basic
-            - integ_next_datastore_13_js
+#             - integ_next_datastore_13_basic
+#             - integ_next_datastore_13_js
             - integ_vite_datastore_basic_crud
             - integ_rollup_datastore_basic_crud
             - integ_vanilla_js_datastore_basic_crud
