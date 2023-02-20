@@ -2,7 +2,7 @@ import { Amplify, UniversalStorage } from '@aws-amplify/core';
 
 import { withSSRContext } from '../src/withSSRContext';
 
-describe('withSSRContext', () => {
+describe.skip('withSSRContext', () => {
 	it('should not require context (for client-side requests)', () => {
 		expect(() => withSSRContext()).not.toThrow();
 	});

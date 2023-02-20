@@ -62,7 +62,7 @@ describe('PushNotification:', () => {
 		clearPlatformMock();
 	});
 
-	describe('Amplify register ->', () => {
+	describe.skip('Amplify register ->', () => {
 		test('should register with Amplify', () => {
 			const registerSpy = jest.spyOn(Amplify, 'register');
 

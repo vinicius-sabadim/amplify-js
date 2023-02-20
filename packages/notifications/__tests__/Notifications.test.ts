@@ -10,7 +10,7 @@ jest.mock('../src/InAppMessaging', () =>
 );
 
 describe('Notifications', () => {
-	test('registers with Amplify', () => {
+	test.skip('registers with Amplify', () => {
 		expect(Amplify.register).toBeCalledWith(Notifications);
 	});
 

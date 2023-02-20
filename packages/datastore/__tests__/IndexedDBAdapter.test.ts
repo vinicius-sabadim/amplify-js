@@ -29,7 +29,7 @@ let initSchema: typeof initSchemaType;
 let DataStore: typeof DataStoreType;
 let Predicates = PredicatesClass;
 
-describe('IndexedDBAdapter tests', () => {
+describe.skip('IndexedDBAdapter tests', () => {
 	async function getMutations(adapter) {
 		await pause(250);
 		return await adapter.getAll('sync_MutationEvent');

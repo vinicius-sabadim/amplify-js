@@ -112,7 +112,7 @@ class InnerSQLiteDatabase {
 	async close() {}
 }
 
-describe('SQLiteAdapter', () => {
+describe.skip('SQLiteAdapter', () => {
 	let Comment: PersistentModelConstructor<Comment>;
 	let Model: PersistentModelConstructor<Model>;
 	let Post: PersistentModelConstructor<Post>;

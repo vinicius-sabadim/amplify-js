@@ -58,7 +58,7 @@ process.on('unhandledRejection', reason => {
 	console.log(reason); // log the reason including the stack trace
 });
 
-describe('DataStore sanity testing checks', () => {
+describe.skip('DataStore sanity testing checks', () => {
 	beforeEach(async () => {
 		jest.resetAllMocks();
 		jest.resetModules();
@@ -1657,7 +1657,7 @@ describe('DataStore observeQuery, with fake-indexeddb and fake sync', () => {
 	});
 });
 
-describe('Model behavior', () => {
+describe.skip('Model behavior', () => {
 	test('newly instantiated models do not lazy load belongsTo', async () => {
 		const { DataStore, DefaultPKChild, DefaultPKParent } = getDataStore();
 

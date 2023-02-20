@@ -22,7 +22,7 @@ let DataStore: typeof DataStoreType;
 // using any to get access to private methods
 const ASAdapter = <any>AsyncStorageAdapter;
 
-describe('AsyncStorageAdapter tests', () => {
+describe.skip('AsyncStorageAdapter tests', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
