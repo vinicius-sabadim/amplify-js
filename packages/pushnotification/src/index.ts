@@ -5,4 +5,3 @@ import NotificationClass from './PushNotification';
 
 const _instance = new NotificationClass(null);
 export const PushNotification = _instance;
-Amplify.register(PushNotification);

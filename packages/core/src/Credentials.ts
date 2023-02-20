@@ -653,5 +653,3 @@ export class CredentialsClass {
 }
 
 export const Credentials = new CredentialsClass(null);
-
-Amplify.register(Credentials);

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {
-	Amplify,
 	ConsoleLogger as Logger,
 	Hub,
 	parseAWSExports,
@@ -46,7 +45,7 @@ const trackers = {
 };
 
 type TrackerTypes = keyof typeof trackers;
-type Trackers = typeof trackers[TrackerTypes];
+type Trackers = (typeof trackers)[TrackerTypes];
 let _instance = null;
 
 /**
@@ -444,4 +443,3 @@ const sendEvents = () => {
 };
 
 export const Analytics = new AnalyticsClass();
-Amplify.register(Analytics);

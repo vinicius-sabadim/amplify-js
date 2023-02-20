@@ -46,4 +46,3 @@ class NotificationsClass {
 const Notifications = new NotificationsClass();
 
 export default Notifications;
-Amplify.register(Notifications);

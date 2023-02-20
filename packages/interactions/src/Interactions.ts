@@ -7,7 +7,7 @@ import {
 	InteractionsMessage,
 	InteractionsResponse,
 } from './types';
-import { Amplify, ConsoleLogger as Logger } from '@aws-amplify/core';
+import { ConsoleLogger as Logger } from '@aws-amplify/core';
 import { AWSLexProvider } from './Providers';
 const logger = new Logger('Interactions');
 
@@ -159,4 +159,3 @@ export class InteractionsClass {
 }
 
 export const Interactions = new InteractionsClass();
-Amplify.register(Interactions);

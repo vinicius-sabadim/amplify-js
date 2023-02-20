@@ -166,4 +166,3 @@ export class PubSubClass {
 }
 
 export const PubSub = new PubSubClass();
-Amplify.register(PubSub);

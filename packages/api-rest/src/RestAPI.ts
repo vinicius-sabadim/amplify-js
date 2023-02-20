@@ -335,4 +335,3 @@ export class RestAPIClass {
 }
 
 export const RestAPI = new RestAPIClass(null);
-Amplify.register(RestAPI);

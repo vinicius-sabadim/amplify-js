@@ -110,5 +110,3 @@ export class I18n {
 		return true;
 	}
 }
-
-Amplify.register(I18n);

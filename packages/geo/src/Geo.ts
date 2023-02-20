@@ -331,4 +331,3 @@ export class GeoClass {
 }
 
 export const Geo = new GeoClass();
-Amplify.register(Geo);

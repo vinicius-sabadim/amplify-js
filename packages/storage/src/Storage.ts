@@ -434,4 +434,3 @@ const getInstance = () => {
 };
 
 export const StorageInstance: Storage = getInstance();
-Amplify.register(StorageInstance);

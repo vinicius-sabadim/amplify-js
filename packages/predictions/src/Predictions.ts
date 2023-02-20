@@ -246,4 +246,3 @@ export class PredictionsClass {
 }
 
 export const Predictions = new PredictionsClass({});
-Amplify.register(Predictions);

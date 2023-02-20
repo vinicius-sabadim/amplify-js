@@ -487,5 +487,3 @@ export class BrowserStorageCacheClass extends StorageCache implements ICache {
 }
 
 export const BrowserStorageCache: ICache = new BrowserStorageCacheClass();
-
-Amplify.register(BrowserStorageCache);

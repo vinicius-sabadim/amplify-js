@@ -231,4 +231,3 @@ export class APIClass {
 }
 
 export const API = new APIClass(null);
-Amplify.register(API);
