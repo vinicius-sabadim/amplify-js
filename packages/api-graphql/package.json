@@ -8,10 +8,7 @@
   "react-native": {
     "./lib/index": "./lib-esm/index.js"
   },
-  "sideEffects": [
-    "./lib/GraphQLAPI.js",
-    "./lib-esm/GraphQLAPI.js"
-  ],
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
@@ -41,7 +38,11 @@
   },
   "homepage": "https://aws-amplify.github.io/",
   "devDependencies": {
+    "@aws-amplify/core": "inject-packages",
     "@types/zen-observable": "^0.8.0"
+  },
+  "peerDependencies": {
+    "@aws-amplify/core": "inject-packages"
   },
   "files": [
     "lib",
@@ -49,11 +50,10 @@
     "src"
   ],
   "dependencies": {
-    "@aws-amplify/api-rest": "3.0.15",
-    "@aws-amplify/auth": "5.1.9",
-    "@aws-amplify/cache": "5.0.15",
-    "@aws-amplify/core": "5.0.15",
-    "@aws-amplify/pubsub": "5.0.15",
+    "@aws-amplify/api-rest": "inject-packages",
+    "@aws-amplify/auth": "inject-packages",
+    "@aws-amplify/cache": "inject-packages",
+    "@aws-amplify/pubsub": "inject-packages",
     "graphql": "15.8.0",
     "tslib": "^1.8.0",
     "uuid": "^3.2.1",

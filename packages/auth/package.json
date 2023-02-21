@@ -8,10 +8,7 @@
   "react-native": {
     "./lib/index": "./lib-esm/index.js"
   },
-  "sideEffects": [
-    "./lib/Auth.js",
-    "./lib-esm/Auth.js"
-  ],
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
@@ -46,11 +43,14 @@
     "src"
   ],
   "dependencies": {
-    "@aws-amplify/core": "5.0.15",
-    "amazon-cognito-identity-js": "6.1.2",
+    "amazon-cognito-identity-js": "inject-packages",
     "tslib": "^1.8.0"
   },
+  "peerDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
   "devDependencies": {
+    "@aws-amplify/core": "inject-packages",
     "@jest/test-sequencer": "^24.9.0"
   },
   "size-limit": [

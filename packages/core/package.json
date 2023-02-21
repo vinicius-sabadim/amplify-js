@@ -8,12 +8,7 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"sideEffects": [
-		"./lib/I18n/index.js",
-		"./lib/Credentials.js",
-		"./lib-esm/I18n/index.js",
-		"./lib-esm/Credentials.js"
-	],
+	"sideEffects": false,
 	"scripts": {
 		"test": "tslint 'src/**/*.ts' && jest -w 1 --coverage",
 		"test:size": "size-limit",

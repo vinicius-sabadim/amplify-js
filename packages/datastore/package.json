@@ -11,10 +11,7 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"sideEffects": [
-		"./lib/datastore/datastore.js",
-		"./lib-esm/datastore/datastore.js"
-	],
+	"sideEffects": false,
 	"scripts": {
 		"test": "npm run lint && jest -w 1 --coverage",
 		"test:size": "size-limit",
@@ -40,7 +37,11 @@
 		"url": "https://github.com/aws/aws-amplify/issues"
 	},
 	"homepage": "https://aws-amplify.github.io/",
+	"peerDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
 	"devDependencies": {
+		"@aws-amplify/core": "inject-packages",
 		"@react-native-community/netinfo": "4.7.0",
 		"@types/uuid": "3.4.6",
 		"@types/uuid-validate": "^0.0.1",
@@ -55,11 +56,10 @@
 		"ssr"
 	],
 	"dependencies": {
-		"@aws-amplify/api": "5.0.15",
-		"@aws-amplify/auth": "5.1.9",
-		"@aws-amplify/core": "5.0.15",
-		"@aws-amplify/pubsub": "5.0.15",
-		"amazon-cognito-identity-js": "6.1.2",
+		"@aws-amplify/api": "inject-packages",
+		"@aws-amplify/auth": "inject-packages",
+		"@aws-amplify/pubsub": "inject-packages",
+		"amazon-cognito-identity-js": "inject-packages",
 		"idb": "5.0.6",
 		"immer": "9.0.6",
 		"ulid": "2.3.0",

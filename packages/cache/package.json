@@ -8,12 +8,7 @@
   "react-native": {
     "./lib/index": "./lib-esm/reactnative.js"
   },
-  "sideEffects": [
-    "./lib/BrowserStorageCache.js",
-    "./lib/AsyncStorageCache.js",
-    "./lib-esm/BrowserStorageCache.js",
-    "./lib-esm/AsyncStorageCache.js"
-  ],
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
@@ -48,9 +43,14 @@
     "src"
   ],
   "dependencies": {
-    "@aws-amplify/core": "5.0.15",
     "tslib": "^1.8.0"
   },
+  "peerDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
+  "devDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
   "size-limit": [
     {
       "name": "Cache (default browser storage)",

@@ -5,10 +5,7 @@
 	"main": "./lib/index.js",
 	"module": "./lib-esm/index.js",
 	"typings": "./lib-esm/index.d.ts",
-	"sideEffects": [
-		"./lib/Notifications.js",
-		"./lib-esm/Notifications.js"
-	],
+	"sideEffects": false,
 	"publishConfig": {
 		"access": "public"
 	},
@@ -47,11 +44,16 @@
 		"src"
 	],
 	"dependencies": {
-		"@aws-amplify/cache": "5.0.15",
-		"@aws-amplify/core": "5.0.15",
+		"@aws-amplify/cache": "inject-packages",
 		"@aws-sdk/client-pinpoint": "3.186.0",
 		"lodash": "^4.17.21",
 		"uuid": "^3.2.1"
+	},
+	"peerDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
+	"devDependencies": {
+		"@aws-amplify/core": "inject-packages"
 	},
 	"size-limit": [
 		{

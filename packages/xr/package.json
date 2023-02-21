@@ -1,5 +1,6 @@
 {
   "name": "@aws-amplify/xr",
+  "private": true,
   "version": "4.0.15",
   "description": "XR category of aws-amplify",
   "main": "./lib/index.js",
@@ -8,10 +9,7 @@
   "react-native": {
     "./lib/index": "./lib-esm/index.js"
   },
-  "sideEffects": [
-    "./lib/XR.js",
-    "./lib-esm/XR.js"
-  ],
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
@@ -45,8 +43,10 @@
     "lib-esm",
     "src"
   ],
+  "peerDependencies": {
+    "@aws-amplify/core": "inject-packages"
+  },
   "dependencies": {
-    "@aws-amplify/core": "5.0.15",
     "tslib": "^1.8.0"
   },
   "size-limit": [

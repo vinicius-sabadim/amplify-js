@@ -8,10 +8,7 @@
   "react-native": {
     "./lib/index": "./lib-esm/index.js"
   },
-  "sideEffects": [
-    "./lib/RestAPI.js",
-    "./lib-esm/RestAPI.js"
-  ],
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
@@ -45,8 +42,13 @@
     "lib-esm",
     "src"
   ],
+  "peerDependencies": {
+    "@aws-amplify/core": "inject-packages"
+  },
+  "devDependencies": {
+    "@aws-amplify/core": "inject-packages"
+  },
   "dependencies": {
-    "@aws-amplify/core": "5.0.15",
     "axios": "0.26.0",
     "tslib": "^1.8.0"
   },

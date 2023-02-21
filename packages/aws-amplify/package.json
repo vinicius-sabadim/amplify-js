@@ -39,20 +39,24 @@
     "lib-esm",
     "src"
   ],
+  "peerDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
+  "devDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
   "dependencies": {
-    "@aws-amplify/analytics": "6.0.15",
-    "@aws-amplify/api": "5.0.15",
-    "@aws-amplify/auth": "5.1.9",
-    "@aws-amplify/cache": "5.0.15",
-    "@aws-amplify/core": "5.0.15",
-    "@aws-amplify/datastore": "4.0.15",
-    "@aws-amplify/geo": "2.0.15",
-    "@aws-amplify/interactions": "5.0.15",
-    "@aws-amplify/notifications": "1.0.15",
-    "@aws-amplify/predictions": "5.0.15",
-    "@aws-amplify/pubsub": "5.0.15",
-    "@aws-amplify/storage": "5.1.5",
-    "@aws-amplify/xr": "4.0.15",
+    "@aws-amplify/analytics": "inject-packages",
+    "@aws-amplify/api": "inject-packages",
+    "@aws-amplify/auth": "inject-packages",
+    "@aws-amplify/cache": "inject-packages",
+    "@aws-amplify/datastore": "inject-packages",
+    "@aws-amplify/geo": "inject-packages",
+    "@aws-amplify/interactions": "inject-packages",
+    "@aws-amplify/notifications": "inject-packages",
+    "@aws-amplify/predictions": "inject-packages",
+    "@aws-amplify/pubsub": "inject-packages",
+    "@aws-amplify/storage": "inject-packages",
     "tslib": "^2.0.0"
   },
   "jest": {

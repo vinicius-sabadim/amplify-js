@@ -8,10 +8,7 @@
 	"react-native": {
 		"./lib/index": "./lib-esm/index.js"
 	},
-	"sideEffects": [
-		"./lib/Predictions.js",
-		"./lib-esm/Predictions.js"
-	],
+	"sideEffects": false,
 	"scripts": {
 		"test": "jest -w 1 --passWithNoTests --coverage --maxWorkers 2",
 		"test:size": "size-limit",
@@ -44,9 +41,14 @@
 		"lib-esm",
 		"src"
 	],
+	"peerDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
+	"devDependencies": {
+		"@aws-amplify/core": "inject-packages"
+	},
 	"dependencies": {
-		"@aws-amplify/core": "5.0.15",
-		"@aws-amplify/storage": "5.1.5",
+		"@aws-amplify/storage": "inject-packages",
 		"@aws-sdk/client-comprehend": "3.6.1",
 		"@aws-sdk/client-polly": "3.6.1",
 		"@aws-sdk/client-rekognition": "3.6.1",
