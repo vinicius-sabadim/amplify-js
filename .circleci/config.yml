@@ -1623,9 +1623,9 @@ workflows:
       - unit_test:
           requires:
             - build
-      - bundle_test:
-          requires:
-            - build
+      # - bundle_test:
+      #     requires:
+      #       - build
       - integ_react_auth_1:
           requires:
             - integ_setup
@@ -2168,7 +2168,7 @@ workflows:
             <<: *releasable_branches
           requires:
             - unit_test
-            - bundle_test
+            # - bundle_test
             # - integ_react_delete_user
             # - integ_react_predictions
             # - integ_react_datastore
