@@ -5,6 +5,8 @@ export {
 	ModelInstanceCreator,
 	AsyncCollection,
 	AsyncItem,
+	DataStoreRuntimeContext,
+	ModelBuilder,
 } from './datastore/datastore';
 
 export {

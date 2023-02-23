@@ -74,6 +74,8 @@ import {
 	isFieldAssociation,
 	RecursiveModelPredicateExtender,
 	ModelPredicateExtender,
+	ModelFields,
+	OpType,
 } from '../types';
 // tslint:disable:no-duplicate-imports
 import type { __modelMeta__ } from '../types';
@@ -110,6 +112,8 @@ import DataStoreConnectivity from '../sync/datastoreConnectivity';
 
 setAutoFreeze(true);
 enablePatches();
+
+const tmpMap = new Map<string, any>();
 
 const logger = new Logger('DataStore');
 
@@ -2618,5 +2622,91 @@ class DataStore {
 
 const instance = new DataStore();
 Amplify.register(instance);
+
+type OperationDocumentTuple = { fieldName: string; document: string };
+const builders = new Map<
+	ModelBuilder,
+	{
+		queries: {
+			sync?: OperationDocumentTuple;
+			mutations: Partial<Record<OpType, OperationDocumentTuple>>;
+		};
+		fields: Record<string, { type?: ModelField['type'] }>;
+	}
+>();
+export class ModelBuilder {
+	static instance() {
+		const instance = new ModelBuilder();
+
+		builders.set(instance, { queries: { mutations: {} }, fields: {} });
+
+		return instance;
+	}
+
+	field(name: string, type?: ModelField['type']) {
+		builders.get(this)!.fields[name] = { type };
+
+		return this;
+	}
+	hasMany(name: string) {
+		return this;
+	}
+	syncQuery(fieldName: string, document: string) {
+		builders.get(this)!.queries.sync = { fieldName, document };
+		return this;
+	}
+	mutations(mutations: Partial<Record<OpType, OperationDocumentTuple>>) {
+		Object.entries(mutations).forEach(([opType, { fieldName, document }]) => {
+			builders.get(this)!.queries.mutations[opType] = { fieldName, document };
+		});
+
+		return this;
+	}
+}
+
+export class DataStoreRuntimeContext {
+	static create<T extends Record<string, ModelBuilder>>(
+		schema: T
+	): Record<keyof T, PersistentModelConstructor<any>> {
+		console.log(Array.from(builders.entries()));
+
+		const mipr: Schema = {
+			models: {},
+			version: '1.2',
+			codegenVersion: '3.4',
+			enums: {},
+		};
+
+		Object.entries(schema).forEach(([modelName, modelDefinition]) => {
+			const fields: ModelFields = {};
+
+			const x = builders.get(modelDefinition)!;
+
+			Object.entries(x.fields).forEach(([fieldName, { type }]) => {
+				fields[fieldName] = {
+					name: fieldName,
+					type: type!,
+					isArray: false,
+				};
+			});
+
+			mipr.models[modelName] = {
+				name: modelName,
+				pluralName: `${modelName}s`,
+				fields,
+				syncable: true,
+				queries: {
+					sync: {
+						fieldName: x.queries.sync?.fieldName!,
+						document: x.queries.sync?.document!,
+					},
+					mutations: x.queries.mutations,
+				},
+			};
+		});
+
+		return initSchema(mipr) as any;
+	}
+}
 
 export { DataStore as DataStoreClass, initSchema, instance as DataStore };

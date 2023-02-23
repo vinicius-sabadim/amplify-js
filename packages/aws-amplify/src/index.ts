@@ -19,6 +19,8 @@ export {
 	Predicates,
 	SortDirection,
 	syncExpression,
+	ModelBuilder,
+	DataStoreRuntimeContext,
 } from '@aws-amplify/datastore';
 export { PubSub } from '@aws-amplify/pubsub';
 export { Cache } from '@aws-amplify/cache';

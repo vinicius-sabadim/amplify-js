@@ -60,6 +60,13 @@ export type SchemaModel = {
 	allFields?: ModelFields;
 
 	syncable?: boolean;
+
+	queries?: {
+		sync?: { fieldName: string; document: string };
+		mutations?: Partial<
+			Record<OpType, { fieldName: string; document: string }>
+		>;
+	};
 };
 
 export function isSchemaModel(obj: any): obj is SchemaModel {

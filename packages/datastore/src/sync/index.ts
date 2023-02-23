@@ -164,14 +164,21 @@ export class SyncEngine {
 			this.amplifyContext
 		);
 
-		this.subscriptionsProcessor = new SubscriptionProcessor(
-			this.schema,
-			this.syncPredicates,
-			this.amplifyConfig,
-			this.authModeStrategy,
-			errorHandler,
-			this.amplifyContext
-		);
+		// this.subscriptionsProcessor = new SubscriptionProcessor(
+		// 	this.schema,
+		// 	this.syncPredicates,
+		// 	this.amplifyConfig,
+		// 	this.authModeStrategy,
+		// 	errorHandler,
+		// 	this.amplifyContext
+		// );
+
+		this.subscriptionsProcessor = {
+			start(): any {
+				return [Observable.of(CONTROL_MSG.CONNECTED), Observable.of()];
+			},
+			stop(): any {},
+		} as any;
 
 		this.mutationsProcessor = new MutationProcessor(
 			this.schema,

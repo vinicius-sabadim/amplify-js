@@ -87,21 +87,51 @@ class MutationProcessor {
 			Object.values(namespace.models)
 				.filter(({ syncable }) => syncable)
 				.forEach(model => {
-					const [createMutation] = buildGraphQLOperation(
+					let [createMutation] = buildGraphQLOperation(
 						namespace,
 						model,
 						'CREATE'
 					);
-					const [updateMutation] = buildGraphQLOperation(
+					let [updateMutation] = buildGraphQLOperation(
 						namespace,
 						model,
 						'UPDATE'
 					);
-					const [deleteMutation] = buildGraphQLOperation(
+					let [deleteMutation] = buildGraphQLOperation(
 						namespace,
 						model,
 						'DELETE'
 					);
+
+					if (model.queries?.mutations) {
+						Object.entries(model.queries.mutations).forEach(
+							([opType, { fieldName, document }]) => {
+								switch (opType) {
+									case OpType.INSERT:
+										createMutation = [
+											TransformerMutationType.CREATE,
+											fieldName,
+											document,
+										];
+										break;
+									case OpType.UPDATE:
+										updateMutation = [
+											TransformerMutationType.UPDATE,
+											fieldName,
+											document,
+										];
+										break;
+									case OpType.DELETE:
+										deleteMutation = [
+											TransformerMutationType.DELETE,
+											fieldName,
+											document,
+										];
+										break;
+								}
+							}
+						);
+					}
 
 					this.typeQuery.set(model, [
 						createMutation,

@@ -60,11 +60,18 @@ class SyncProcessor {
 			Object.values(namespace.models)
 				.filter(({ syncable }) => syncable)
 				.forEach(model => {
-					const [[, ...opNameQuery]] = buildGraphQLOperation(
+					let [[, ...opNameQuery]] = buildGraphQLOperation(
 						namespace,
 						model,
 						'LIST'
 					);
+
+					if (model.queries?.sync) {
+						opNameQuery = [
+							model.queries?.sync.fieldName,
+							model.queries?.sync.document,
+						];
+					}
 
 					this.typeQuery.set(model, opNameQuery);
 				});
