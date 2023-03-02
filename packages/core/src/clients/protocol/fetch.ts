@@ -3,7 +3,6 @@ import {
 	HttpResponse,
 	HttpTransferOptions,
 	Method,
-	ResponseBodyMixin,
 } from '../types/http';
 import { TransferClient } from '../types/core';
 

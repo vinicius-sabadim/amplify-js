@@ -13,12 +13,13 @@ export const sigV4Auth: Middleware<
 	HttpRequest,
 	HttpResponse,
 	SigV4AuthOptions
-> = (next, context) => async (request, options) => {
-	/**
-	 * TODO: implement SigV4 signing.
-	 */
-	return next(request, options);
-};
+> = (next, context) =>
+	async function sigV4Auth(request, options) {
+		/**
+		 * TODO: implement SigV4 signing.
+		 */
+		return next(request, options);
+	};
 
 /**
  * TODO
@@ -27,8 +28,11 @@ export interface JwtAuthOptions {
 	jwtProvider: () => Promise<string>;
 }
 
-export const jwtAuth: Middleware<HttpRequest, HttpResponse, JwtAuthOptions> =
-	(next, context) => async (request, options) => {
+export const jwtAuth: Middleware<HttpRequest, HttpResponse, JwtAuthOptions> = (
+	next,
+	context
+) =>
+	async function jwtAuth(request, options) {
 		/**
 		 * TODO: implement jwt auth
 		 */
@@ -46,9 +50,10 @@ export const apiKeyAuth: Middleware<
 	HttpRequest,
 	HttpResponse,
 	JwtAuthOptions
-> = (next, context) => async (request, options) => {
-	/**
-	 * TODO: implement api key auth
-	 */
-	return next(request, options);
-};
+> = (next, context) =>
+	async function apiKeyAuth(request, options) {
+		/**
+		 * TODO: implement api key auth
+		 */
+		return next(request, options);
+	};

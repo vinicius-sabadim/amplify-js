@@ -22,16 +22,12 @@ export type MiddlewareHandler<Request, Response, MiddlewareOptions> = (
 	options: MiddlewareOptions
 ) => Promise<Response>;
 
+export type MiddlewareContext = Record<string, unknown>;
+
 /**
  * A slimmed down version of the AWS SDK v3 middleware, only handling tasks after Serde.
  */
 export type Middleware<Request, Response, MiddlewareOptions> = (
 	next: MiddlewareHandler<Request, Response, MiddlewareOptions>,
-	context: Record<string, unknown>
+	context: MiddlewareContext
 ) => MiddlewareHandler<Request, Response, MiddlewareOptions>;
-
-export type ComposeServiceApi<Input, Output, Request, Response, Options> = (
-	transferClient: TransferClient<Request, Response, Options>,
-	serializer: (input: Input) => Promise<Request>,
-	deserializer: (output: Response) => Promise<Output>
-) => (input: Input, options: Options) => Promise<Output>;

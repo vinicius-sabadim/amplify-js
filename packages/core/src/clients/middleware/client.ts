@@ -1,38 +1,29 @@
 import {
-	Middleware,
 	MiddlewareHandler,
 	TransferClient,
 	Request as RequestBase,
 	Response as ResponseBase,
 } from '../types/core';
-
-type EnsureNoSameKeys<T, U> = keyof T & keyof U extends never ? true : false;
-export type MergeTypeNoSameKeys<T, U> = EnsureNoSameKeys<T, U> extends true
-	? T & U
-	: never;
+import { OptionToMiddleware, MergeNoSameKeys } from '../types/util';
 
 export const composeTransferClient = <
 	Request extends RequestBase,
 	Response extends ResponseBase,
 	TransferOptions,
-	MiddlewareOptions
+	MiddlewareOptionsArr extends any[]
 >(
 	coreClient: TransferClient<Request, Response, TransferOptions>,
-	middleware?: Middleware<Request, Response, MiddlewareOptions>[]
+	middleware: OptionToMiddleware<Request, Response, MiddlewareOptionsArr>
 ) => {
-	if (!middleware) {
-		return coreClient;
-	}
-
 	return {
 		send: (
 			request: Request,
-			options: MergeTypeNoSameKeys<MiddlewareOptions, TransferOptions>
+			options: MergeNoSameKeys<[...MiddlewareOptionsArr, TransferOptions]>
 		) => {
 			let composedHandler = coreClient.send as unknown as MiddlewareHandler<
 				Request,
 				Response,
-				MiddlewareOptions
+				MiddlewareOptionsArr[number]
 			>;
 			for (const m of middleware.reverse()) {
 				composedHandler = m(composedHandler, {});
@@ -41,3 +32,21 @@ export const composeTransferClient = <
 		},
 	};
 };
+
+export const composeServiceApi =
+	<
+		Input,
+		Output,
+		Request extends RequestBase,
+		Response extends ResponseBase,
+		Options
+	>(
+		transferClient: TransferClient<Request, Response, Options>,
+		serializer: (input: Input) => Promise<Request>,
+		deserializer: (output: Response) => Promise<Output>
+	) =>
+	async (input: Input, options: Options) => {
+		const request = await serializer(input);
+		const response = await transferClient.send(request, options);
+		return await deserializer(response);
+	};
