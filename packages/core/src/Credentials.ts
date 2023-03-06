@@ -6,19 +6,12 @@ import { jitteredExponentialRetry } from './Util';
 import { ICredentials } from './types';
 import { Amplify } from './Amplify';
 import {
-	fromCognitoIdentity,
-	FromCognitoIdentityParameters,
-	fromCognitoIdentityPool,
-	FromCognitoIdentityPoolParameters,
-} from '@aws-sdk/credential-provider-cognito-identity';
-import {
-	GetIdCommand,
-	GetCredentialsForIdentityCommand,
-} from '@aws-sdk/client-cognito-identity';
-import { CredentialProvider } from '@aws-sdk/types';
+	CognitoIdentityServiceContext,
+	getId,
+	getCredentialsForIdentity,
+} from './clients/cognito-identity';
 import { parseAWSExports } from './parseAWSExports';
 import { Hub } from './Hub';
-import { createCognitoIdentityClient } from './Util/CognitoIdentityClient';
 
 const logger = new Logger('Credentials');
 
@@ -291,47 +284,25 @@ export class CredentialsClass {
 
 		const identityId = (this._identityId = await this._getGuestIdentityId());
 
-		const cognitoClient = createCognitoIdentityClient({
-			region: identityPoolRegion || region,
-		});
-
 		let credentials = undefined;
-		if (identityId) {
-			const cognitoIdentityParams: FromCognitoIdentityParameters = {
-				identityId,
-				client: cognitoClient,
-			};
-			credentials = fromCognitoIdentity(cognitoIdentityParams)();
-		} else {
-			/*
-			Retreiving identityId with GetIdCommand to mimic the behavior in the following code in aws-sdk-v3:
-			https://git.io/JeDxU
-
-			Note: Retreive identityId from CredentialsProvider once aws-sdk-js v3 supports this.
-			*/
-			const credentialsProvider: CredentialProvider = async () => {
-				const { IdentityId } = await cognitoClient.send(
-					new GetIdCommand({
-						IdentityPoolId: identityPoolId,
-					})
-				);
-				this._identityId = IdentityId;
-				const cognitoIdentityParams: FromCognitoIdentityParameters = {
-					client: cognitoClient,
-					identityId: IdentityId,
-				};
-
-				const credentialsFromCognitoIdentity = fromCognitoIdentity(
-					cognitoIdentityParams
-				);
-
-				return credentialsFromCognitoIdentity();
-			};
-
-			credentials = credentialsProvider().catch(async err => {
-				throw err;
+		if (!identityId) {
+			const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+				IdentityPoolId: identityPoolId,
 			});
+			this._identityId = IdentityId!;
 		}
+		const { Credentials } = await getCredentialsForIdentity(
+			CognitoIdentityServiceContext,
+			{
+				IdentityId: identityId,
+			}
+		);
+		credentials = {
+			accessKeyId: Credentials!.AccessKeyId,
+			secretAccessKey: Credentials!.SecretKey,
+			sessionToken: Credentials!.SessionToken,
+			expiration: Credentials!.Expiration,
+		};
 
 		return this._loadCredentials(credentials, 'guest', false, null)
 			.then(res => {
@@ -347,28 +318,22 @@ export class CredentialsClass {
 					logger.debug('Failed to load guest credentials');
 					await this._removeGuestIdentityId();
 
-					const credentialsProvider: CredentialProvider = async () => {
-						const { IdentityId } = await cognitoClient.send(
-							new GetIdCommand({
-								IdentityPoolId: identityPoolId,
-							})
-						);
-						this._identityId = IdentityId;
-						const cognitoIdentityParams: FromCognitoIdentityParameters = {
-							client: cognitoClient,
-							identityId: IdentityId,
-						};
-
-						const credentialsFromCognitoIdentity = fromCognitoIdentity(
-							cognitoIdentityParams
-						);
-
-						return credentialsFromCognitoIdentity();
-					};
-
-					credentials = credentialsProvider().catch(async err => {
-						throw err;
+					const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+						IdentityPoolId: identityPoolId,
 					});
+					this._identityId = IdentityId!;
+					const { Credentials } = await getCredentialsForIdentity(
+						CognitoIdentityServiceContext,
+						{
+							IdentityId: identityId,
+						}
+					);
+					credentials = {
+						accessKeyId: Credentials!.AccessKeyId,
+						secretAccessKey: Credentials!.SecretKey,
+						sessionToken: Credentials!.SessionToken,
+						expiration: Credentials!.Expiration,
+					};
 
 					return this._loadCredentials(credentials, 'guest', false, null);
 				} else {
@@ -377,7 +342,7 @@ export class CredentialsClass {
 			});
 	}
 
-	private _setCredentialsFromFederation(params) {
+	private async _setCredentialsFromFederation(params) {
 		const { provider, token, identity_id } = params;
 		const domains = {
 			google: 'accounts.google.com',
@@ -407,30 +372,32 @@ export class CredentialsClass {
 			);
 		}
 
-		const cognitoClient = createCognitoIdentityClient({
-			region: identityPoolRegion || region,
-		});
-
 		let credentials = undefined;
-		if (identity_id) {
-			const cognitoIdentityParams: FromCognitoIdentityParameters = {
-				identityId: identity_id,
-				logins,
-				client: cognitoClient,
-			};
-			credentials = fromCognitoIdentity(cognitoIdentityParams)();
-		} else {
-			const cognitoIdentityParams: FromCognitoIdentityPoolParameters = {
-				logins,
-				identityPoolId,
-				client: cognitoClient,
-			};
-			credentials = fromCognitoIdentityPool(cognitoIdentityParams)();
+		let identityId = undefined;
+		if (!identity_id) {
+			const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+				Logins: logins,
+				IdentityPoolId: identityPoolId,
+			});
+			identityId = IdentityId!;
 		}
+		const { Credentials } = await getCredentialsForIdentity(
+			CognitoIdentityServiceContext,
+			{
+				Logins: logins,
+				IdentityId: identityId!,
+			}
+		);
+		credentials = {
+			accessKeyId: Credentials!.AccessKeyId,
+			secretAccessKey: Credentials!.SecretKey,
+			sessionToken: Credentials!.SessionToken,
+			expiration: Credentials!.Expiration,
+		};
 		return this._loadCredentials(credentials, 'federated', true, params);
 	}
 
-	private _setCredentialsFromSession(session): Promise<ICredentials> {
+	private async _setCredentialsFromSession(session): Promise<ICredentials> {
 		logger.debug('set credentials from session');
 		const idToken = session.getIdToken().getJwtToken();
 		const { region, userPoolId, identityPoolId, identityPoolRegion } =
@@ -449,74 +416,49 @@ export class CredentialsClass {
 		const logins = {};
 		logins[key] = idToken;
 
-		const cognitoClient = createCognitoIdentityClient({
-			region: identityPoolRegion || region,
+		// try to fetch the local stored guest identity, if found, we will associate it with the logins
+		const guestIdentityId = await this._getGuestIdentityId();
+		let generatedOrRetrievedIdentityId;
+		if (!guestIdentityId) {
+			// for a first-time user, this will return a brand new identity
+			// for a returning user, this will retrieve the previous identity assocaited with the logins
+			const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+				Logins: logins,
+				IdentityPoolId: identityPoolId,
+			});
+			generatedOrRetrievedIdentityId = IdentityId;
+		}
+
+		const {
+			Credentials: { AccessKeyId, Expiration, SecretKey, SessionToken },
+			IdentityId: primaryIdentityId,
+		} = await getCredentialsForIdentity(CognitoIdentityServiceContext, {
+			Logins: logins,
+			IdentityId: guestIdentityId || generatedOrRetrievedIdentityId,
 		});
 
-		/* 
-			Retreiving identityId with GetIdCommand to mimic the behavior in the following code in aws-sdk-v3:
-			https://git.io/JeDxU
-
-			Note: Retreive identityId from CredentialsProvider once aws-sdk-js v3 supports this.
-		*/
-		const credentialsProvider: CredentialProvider = async () => {
-			// try to fetch the local stored guest identity, if found, we will associate it with the logins
-			const guestIdentityId = await this._getGuestIdentityId();
-
-			let generatedOrRetrievedIdentityId;
-			if (!guestIdentityId) {
-				// for a first-time user, this will return a brand new identity
-				// for a returning user, this will retrieve the previous identity assocaited with the logins
-				const { IdentityId } = await cognitoClient.send(
-					new GetIdCommand({
-						IdentityPoolId: identityPoolId,
-						Logins: logins,
-					})
-				);
-				generatedOrRetrievedIdentityId = IdentityId;
-			}
-
-			const {
-				Credentials: { AccessKeyId, Expiration, SecretKey, SessionToken },
-				// single source of truth for the primary identity associated with the logins
-				// only if a guest identity is used for a first-time user, that guest identity will become its primary identity
-				IdentityId: primaryIdentityId,
-			} = await cognitoClient.send(
-				new GetCredentialsForIdentityCommand({
-					IdentityId: guestIdentityId || generatedOrRetrievedIdentityId,
-					Logins: logins,
-				})
+		this._identityId = primaryIdentityId;
+		if (guestIdentityId) {
+			// if guestIdentity is found and used by GetCredentialsForIdentity
+			// it will be linked to the logins provided, and disqualified as an unauth identity
+			logger.debug(
+				`The guest identity ${guestIdentityId} has been successfully linked to the logins`
 			);
-
-			this._identityId = primaryIdentityId;
-			if (guestIdentityId) {
-				// if guestIdentity is found and used by GetCredentialsForIdentity
-				// it will be linked to the logins provided, and disqualified as an unauth identity
+			if (guestIdentityId === primaryIdentityId) {
 				logger.debug(
-					`The guest identity ${guestIdentityId} has been successfully linked to the logins`
+					`The guest identity ${guestIdentityId} has become the primary identity`
 				);
-				if (guestIdentityId === primaryIdentityId) {
-					logger.debug(
-						`The guest identity ${guestIdentityId} has become the primary identity`
-					);
-				}
-				// remove it from local storage to avoid being used as a guest Identity by _setCredentialsForGuest
-				await this._removeGuestIdentityId();
 			}
-
-			// https://github.com/aws/aws-sdk-js-v3/blob/main/packages/credential-provider-cognito-identity/src/fromCognitoIdentity.ts#L40
-			return {
-				accessKeyId: AccessKeyId,
-				secretAccessKey: SecretKey,
-				sessionToken: SessionToken,
-				expiration: Expiration,
-				identityId: primaryIdentityId,
-			};
+			// remove it from local storage to avoid being used as a guest Identity by _setCredentialsForGuest
+			await this._removeGuestIdentityId();
+		}
+		const credentials = {
+			accessKeyId: AccessKeyId,
+			secretAccessKey: SecretKey,
+			sessionToken: SessionToken,
+			expiration: Expiration,
+			identityId: primaryIdentityId,
 		};
-
-		const credentials = credentialsProvider().catch(async err => {
-			throw err;
-		});
 
 		return this._loadCredentials(credentials, 'userPool', true, null);
 	}
@@ -578,11 +520,11 @@ export class CredentialsClass {
 		});
 	}
 
-	public set(params, source): Promise<ICredentials> {
+	public async set(params, source): Promise<ICredentials> {
 		if (source === 'session') {
 			return this._setCredentialsFromSession(params);
 		} else if (source === 'federation') {
-			return this._setCredentialsFromFederation(params);
+			return await this._setCredentialsFromFederation(params);
 		} else if (source === 'guest') {
 			return this._setCredentialsForGuest();
 		} else {
