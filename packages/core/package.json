@@ -68,6 +68,7 @@
 		"@aws-sdk/client-cloudwatch-logs": "3.6.1",
 		"@aws-sdk/types": "3.6.1",
 		"@aws-sdk/util-hex-encoding": "3.6.1",
+		"isomorphic-unfetch": "^3.0.0",
 		"tslib": "^1.8.0",
 		"universal-cookie": "^4.0.4",
 		"zen-observable-ts": "0.8.19"
@@ -101,7 +102,7 @@
 			"name": "Core (Credentials)",
 			"path": "./lib-esm/index.js",
 			"import": "{ Credentials }",
-			"limit": "9.1 kB"
+			"limit": "9.7 kB"
 		}
 	],
 	"jest": {
