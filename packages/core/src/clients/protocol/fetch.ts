@@ -30,9 +30,9 @@ export const fetchTransferClient: TransferClient<
 		};
 		if (resp.body) {
 			const bodyWithMixin = Object.assign(resp.body, {
-				text: resp.text,
-				blob: resp.blob,
-				json: resp.json,
+				text: () => resp.text(),
+				blob: () => resp.blob(),
+				json: () => resp.json(),
 			});
 			return {
 				...httpResponse,

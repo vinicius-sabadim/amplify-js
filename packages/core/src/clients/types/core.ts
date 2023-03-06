@@ -31,3 +31,9 @@ export type Middleware<Request, Response, MiddlewareOptions> = (
 	next: MiddlewareHandler<Request, Response, MiddlewareOptions>,
 	context: MiddlewareContext
 ) => MiddlewareHandler<Request, Response, MiddlewareOptions>;
+
+export interface Endpoint {
+	url: URL;
+}
+
+export type SideEffectReference<T> = { get(): T; set(value: T): void };

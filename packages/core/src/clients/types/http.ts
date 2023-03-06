@@ -24,7 +24,7 @@ export interface HttpRequest extends Request {
 export type ResponseBodyMixin = Pick<Body, 'blob' | 'json' | 'text'>;
 
 /**
- * TODO: reason?: string property from reference architecture out-of-scope for now.
+ * TODO: reason?: string property from reference architecture is out-of-scope for now.
  */
 export interface HttpResponse extends Response {
 	/**
