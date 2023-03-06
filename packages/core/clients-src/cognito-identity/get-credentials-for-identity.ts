@@ -1,28 +1,20 @@
+import type {
+	GetCredentialsForIdentityCommandInput,
+	GetCredentialsForIdentityCommandOutput,
+} from '@aws-sdk/client-cognito-identity';
 import { httpClient } from '../base';
 import { composeServiceApi } from '../internal/client';
 import { Endpoint } from '../types/core';
 import { HttpRequest, HttpResponse } from '../types/http';
 import { parseBody, throwError } from '../protocol/rest-json';
 
-export interface GetCredentialsForIdentityInput {
-	IdentityId: string;
-	Logins?: Record<string, string>;
-	CustomRoleArn?: string;
-}
-export interface GetCredentialsForIdentityResponse {
-	IdentityId?: string;
-	Credentials?: Credentials;
-}
-
-interface Credentials {
-	AccessKeyId?: string;
-	SecretKey?: string;
-	SessionToken?: string;
-	Expiration?: Date;
-}
+export type {
+	GetCredentialsForIdentityCommandInput,
+	GetCredentialsForIdentityCommandOutput,
+} from '@aws-sdk/client-cognito-identity';
 
 const getCredentialsForIdentitySerializer = async (
-	input: GetCredentialsForIdentityInput,
+	input: GetCredentialsForIdentityCommandInput,
 	endpoint: Endpoint
 ): Promise<HttpRequest> => {
 	return {
@@ -38,7 +30,7 @@ const getCredentialsForIdentitySerializer = async (
 
 const getCredentialsForIdentityDeserializer = async (
 	response: HttpResponse
-): Promise<GetCredentialsForIdentityResponse> => {
+): Promise<GetCredentialsForIdentityCommandOutput> => {
 	if (response.statusCode >= 300) {
 		throw await throwError(response);
 	} else {
@@ -50,7 +42,7 @@ const getCredentialsForIdentityDeserializer = async (
 				...body.Credentials,
 				Expiration: new Date(body.Credentials.Expiration * 1000),
 			},
-		} as GetCredentialsForIdentityResponse;
+		} as GetCredentialsForIdentityCommandOutput;
 	}
 };
 

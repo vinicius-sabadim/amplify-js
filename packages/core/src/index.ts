@@ -69,6 +69,8 @@ export {
 	urlSafeEncode,
 } from './Util';
 
+export * as CognitoIdentityService from './clients/cognito-identity';
+
 /**
  * @deprecated use named import
  */

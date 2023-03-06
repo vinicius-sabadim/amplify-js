@@ -6,7 +6,7 @@ import { jitteredExponentialRetry } from './Util';
 import { ICredentials } from './types';
 import { Amplify } from './Amplify';
 import {
-	CognitoIdentityServiceContext,
+	getContext,
 	getId,
 	getCredentialsForIdentity,
 } from './clients/cognito-identity';
@@ -281,18 +281,19 @@ export class CredentialsClass {
 				'region is not configured for getting the credentials'
 			);
 		}
+		const cognitoIdentityServiceContext = getContext({ region });
 
 		const identityId = (this._identityId = await this._getGuestIdentityId());
 
 		let credentials = undefined;
 		if (!identityId) {
-			const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+			const { IdentityId } = await getId(cognitoIdentityServiceContext, {
 				IdentityPoolId: identityPoolId,
 			});
 			this._identityId = IdentityId!;
 		}
 		const { Credentials } = await getCredentialsForIdentity(
-			CognitoIdentityServiceContext,
+			cognitoIdentityServiceContext,
 			{
 				IdentityId: identityId,
 			}
@@ -318,12 +319,12 @@ export class CredentialsClass {
 					logger.debug('Failed to load guest credentials');
 					await this._removeGuestIdentityId();
 
-					const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+					const { IdentityId } = await getId(cognitoIdentityServiceContext, {
 						IdentityPoolId: identityPoolId,
 					});
 					this._identityId = IdentityId!;
 					const { Credentials } = await getCredentialsForIdentity(
-						CognitoIdentityServiceContext,
+						cognitoIdentityServiceContext,
 						{
 							IdentityId: identityId,
 						}
@@ -371,18 +372,19 @@ export class CredentialsClass {
 				'region is not configured for getting the credentials'
 			);
 		}
+		const cognitoIdentityServiceContext = getContext({ region });
 
 		let credentials = undefined;
 		let identityId = undefined;
 		if (!identity_id) {
-			const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+			const { IdentityId } = await getId(cognitoIdentityServiceContext, {
 				Logins: logins,
 				IdentityPoolId: identityPoolId,
 			});
 			identityId = IdentityId!;
 		}
 		const { Credentials } = await getCredentialsForIdentity(
-			CognitoIdentityServiceContext,
+			cognitoIdentityServiceContext,
 			{
 				Logins: logins,
 				IdentityId: identityId!,
@@ -412,6 +414,7 @@ export class CredentialsClass {
 				'region is not configured for getting the credentials'
 			);
 		}
+		const cognitoIdentityServiceContext = getContext({ region });
 		const key = 'cognito-idp.' + region + '.amazonaws.com/' + userPoolId;
 		const logins = {};
 		logins[key] = idToken;
@@ -422,7 +425,7 @@ export class CredentialsClass {
 		if (!guestIdentityId) {
 			// for a first-time user, this will return a brand new identity
 			// for a returning user, this will retrieve the previous identity assocaited with the logins
-			const { IdentityId } = await getId(CognitoIdentityServiceContext, {
+			const { IdentityId } = await getId(cognitoIdentityServiceContext, {
 				Logins: logins,
 				IdentityPoolId: identityPoolId,
 			});
@@ -432,7 +435,7 @@ export class CredentialsClass {
 		const {
 			Credentials: { AccessKeyId, Expiration, SecretKey, SessionToken },
 			IdentityId: primaryIdentityId,
-		} = await getCredentialsForIdentity(CognitoIdentityServiceContext, {
+		} = await getCredentialsForIdentity(cognitoIdentityServiceContext, {
 			Logins: logins,
 			IdentityId: guestIdentityId || generatedOrRetrievedIdentityId,
 		});
