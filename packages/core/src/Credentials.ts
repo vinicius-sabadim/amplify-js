@@ -295,7 +295,7 @@ export class CredentialsClass {
 		const { Credentials } = await getCredentialsForIdentity(
 			cognitoIdentityServiceContext,
 			{
-				IdentityId: identityId,
+				IdentityId: this._identityId,
 			}
 		);
 		credentials = {
@@ -466,61 +466,55 @@ export class CredentialsClass {
 		return this._loadCredentials(credentials, 'userPool', true, null);
 	}
 
-	private _loadCredentials(
+	private async _loadCredentials(
 		credentials,
 		source,
 		authenticated,
 		info
 	): Promise<ICredentials> {
 		const that = this;
-		return new Promise((res, rej) => {
-			credentials
-				.then(async credentials => {
-					logger.debug('Load credentials successfully', credentials);
-					if (this._identityId && !credentials.identityId) {
-						credentials['identityId'] = this._identityId;
-					}
+		logger.debug('Load credentials successfully', credentials);
+		try {
+			if (this._identityId && !credentials.identityId) {
+				credentials['identityId'] = this._identityId;
+			}
 
-					that._credentials = credentials;
-					that._credentials.authenticated = authenticated;
-					that._credentials_source = source;
-					that._nextCredentialsRefresh = new Date().getTime() + CREDENTIALS_TTL;
-					if (source === 'federated') {
-						const user = Object.assign(
-							{ id: this._credentials.identityId },
-							info.user
-						);
-						const { provider, token, expires_at, identity_id } = info;
-						try {
-							this._storage.setItem(
-								'aws-amplify-federatedInfo',
-								JSON.stringify({
-									provider,
-									token,
-									user,
-									expires_at,
-									identity_id,
-								})
-							);
-						} catch (e) {
-							logger.debug('Failed to put federated info into auth storage', e);
-						}
-					}
-					if (source === 'guest') {
-						await this._setGuestIdentityId(credentials.identityId);
-					}
-					res(that._credentials);
-					return;
-				})
-				.catch(err => {
-					if (err) {
-						logger.debug('Failed to load credentials', credentials);
-						logger.debug('Error loading credentials', err);
-						rej(err);
-						return;
-					}
-				});
-		});
+			that._credentials = credentials;
+			that._credentials.authenticated = authenticated;
+			that._credentials_source = source;
+			that._nextCredentialsRefresh = new Date().getTime() + CREDENTIALS_TTL;
+			if (source === 'federated') {
+				const user = Object.assign(
+					{ id: this._credentials.identityId },
+					info.user
+				);
+				const { provider, token, expires_at, identity_id } = info;
+				try {
+					this._storage.setItem(
+						'aws-amplify-federatedInfo',
+						JSON.stringify({
+							provider,
+							token,
+							user,
+							expires_at,
+							identity_id,
+						})
+					);
+				} catch (e) {
+					logger.debug('Failed to put federated info into auth storage', e);
+				}
+			}
+			if (source === 'guest') {
+				await this._setGuestIdentityId(credentials.identityId);
+			}
+		} catch (err) {
+			if (err) {
+				logger.debug('Failed to load credentials', credentials);
+				logger.debug('Error loading credentials', err);
+				throw err;
+			}
+		}
+		return this._credentials;
 	}
 
 	public async set(params, source): Promise<ICredentials> {
