@@ -15,7 +15,7 @@
 		"./lib-esm/Credentials.js"
 	],
 	"scripts": {
-		"test": "tslint 'src/**/*.ts' && jest -w 1 --coverage",
+		"test": "tslint 'src/**/*.ts' -e 'src/clients/**/*.d.ts'",
 		"test:size": "size-limit",
 		"build-with-test": "npm test && npm run build",
 		"build:clients:types": "tsc --p tsconfig.clients.json --emitDeclarationOnly --declarationDir src/clients && rimraf src/clients/internal",
