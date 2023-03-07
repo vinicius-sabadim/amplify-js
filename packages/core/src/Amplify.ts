@@ -12,22 +12,23 @@ export class AmplifyClass {
 
 	// for backward compatibility to avoid breaking change
 	// if someone is using like Amplify.Auth
-	Auth = null;
-	Analytics = null;
-	API = null;
-	Credentials = null;
-	Storage = null;
-	I18n = null;
-	Cache = null;
-	PubSub = null;
-	Interactions = null;
-	Pushnotification = null;
-	UI = null;
-	XR = null;
-	Predictions = null;
-	DataStore = null;
-	Geo = null;
-	Notifications = null;
+	// TODO: find better types after PoC
+	Auth: any = null;
+	Analytics: any = null;
+	API: any = null;
+	Credentials: any = null;
+	Storage: any = null;
+	I18n: any = null;
+	Cache: any = null;
+	PubSub: any = null;
+	Interactions: any = null;
+	Pushnotification: any = null;
+	UI: any = null;
+	XR: any = null;
+	Predictions: any = null;
+	DataStore: any = null;
+	Geo: any = null;
+	Notifications: any = null;
 
 	Logger = LoggerClass;
 	ServiceWorker = null;

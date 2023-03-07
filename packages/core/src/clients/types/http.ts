@@ -9,8 +9,10 @@ export type Method =
 
 /**
  * Use basic Record interface to workaround fetch Header class not available in Node.js
+ * The header names must be lowercased.
+ * TODO: use LowerCase<string> intrinsic when we can support typescript 4.0
  */
-export type Headers = Record<Lowercase<string>, string>;
+export type Headers = Record<string, string>;
 
 export interface HttpRequest extends Request {
 	method: Method;
@@ -19,7 +21,7 @@ export interface HttpRequest extends Request {
 	 * `fields` is a collection of headers and body trailers to support {@link https://smithy.io/2.0/aws/aws-core.html?highlight=httpchecksum#aws-protocols-httpchecksum-trait httpChecksum trait}
 	 * which is essentially an S3-only feature.
 	 */
-	headers: Record<Lowercase<string>, string>;
+	headers: Headers;
 }
 
 /**

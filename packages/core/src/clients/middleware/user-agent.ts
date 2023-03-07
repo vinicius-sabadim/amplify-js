@@ -18,17 +18,19 @@ export const userAgent: Middleware<
 	UserAgentOptions
 > = (next, context) => {
 	return async function userAgent(request, options) {
-		if (options.userAgentValue ?? ''.trim().length === 0) {
+		const userAgentValue = (options.userAgentValue ?? '').trim();
+		if (userAgentValue.length === 0) {
 			return await next(request, options);
 		} else {
 			// TODO: implement jittered exponential back-off retry.
-			const headerName = options.userAgentHeader ?? 'x-amz-user-agent';
+			const headerName =
+				options.userAgentHeader?.toLowerCase() ?? 'x-amz-user-agent';
 			if (request.headers[headerName]) {
 				request.headers[
 					headerName
-				] = `${request.headers[headerName]} ${options.userAgentValue}`;
+				] = `${request.headers[headerName]} ${userAgentValue}`;
 			} else {
-				request.headers[headerName] = options.userAgentValue;
+				request.headers[headerName] = userAgentValue;
 			}
 			const response = await next(request, options);
 			return response;
