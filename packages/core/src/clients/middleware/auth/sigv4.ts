@@ -124,7 +124,7 @@ const canonicalQueryString = (query: string): string => {
 };
 
 const escapeRfc3986 = (component: string): string => {
-	return component.replace(/[!'()*]/g, function (c) {
+	return component.replace(/[!'()*]/g, function(c) {
 		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
 	});
 };

@@ -15,7 +15,7 @@
 		"./lib-esm/Credentials.js"
 	],
 	"scripts": {
-		"test": "tslint 'src/**/*.ts' -e 'src/clients/**/*.d.ts'",
+		"test": "tslint 'src/**/*.ts' && jest -w 1 --coverage",
 		"test:size": "size-limit",
 		"build-with-test": "npm test && npm run build",
 		"build:cjs": "rimraf lib && tsc -m commonjs --outDir lib && webpack && webpack --config ./webpack.config.dev.js",
@@ -109,16 +109,7 @@
 		"globals": {
 			"ts-jest": {
 				"diagnostics": false,
-				"tsConfig": {
-					"lib": [
-						"es5",
-						"es2015",
-						"dom",
-						"esnext.asynciterable",
-						"es2017.object"
-					],
-					"allowJs": true
-				}
+				"tsConfig": false
 			}
 		},
 		"transform": {

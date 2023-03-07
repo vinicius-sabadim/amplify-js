@@ -419,7 +419,9 @@ export class CredentialsClass {
 				'region is not configured for getting the credentials'
 			);
 		}
-		const cognitoIdentityServiceContext = getContext({ region });
+		const cognitoIdentityServiceContext = getContext({
+			region: identityPoolRegion || region,
+		});
 		const key = 'cognito-idp.' + region + '.amazonaws.com/' + userPoolId;
 		const logins = {};
 		logins[key] = idToken;

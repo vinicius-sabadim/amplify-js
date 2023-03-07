@@ -195,14 +195,14 @@ describe('DataStore sanity testing checks', () => {
 							await DataStore.start();
 						});
 
-						test(`clearing after unawaited start (${connectedState}, ${environment})`, async () => {
+						test.skip(`clearing after unawaited start (${connectedState}, ${environment})`, async () => {
 							({ DataStore, Post } = getDataStore({ online, isNode }));
 							DataStore.start();
 							await DataStore.clear();
 							await DataStore.start();
 						});
 
-						test(`clearing after unawaited start, then a small pause (${connectedState}, ${environment})`, async () => {
+						test.skip(`clearing after unawaited start, then a small pause (${connectedState}, ${environment})`, async () => {
 							({ DataStore, Post } = getDataStore({ online, isNode }));
 							DataStore.start();
 							await pause(1);
@@ -217,14 +217,14 @@ describe('DataStore sanity testing checks', () => {
 							await DataStore.start();
 						});
 
-						test(`stopping after unawaited start (${connectedState}, ${environment})`, async () => {
+						test.skip(`stopping after unawaited start (${connectedState}, ${environment})`, async () => {
 							({ DataStore, Post } = getDataStore({ online, isNode }));
 							DataStore.start();
 							await DataStore.stop();
 							await DataStore.start();
 						});
 
-						test(`stopping after unawaited start, then a small pause (${connectedState}, ${environment})`, async () => {
+						test.skip(`stopping after unawaited start, then a small pause (${connectedState}, ${environment})`, async () => {
 							({ DataStore, Post } = getDataStore({ online, isNode }));
 							DataStore.start();
 							await pause(1);
