@@ -54,7 +54,8 @@
   "files": [
     "lib",
     "lib-esm",
-    "src"
+    "src",
+    "cognito.d.ts"
   ],
   "dependencies": {
     "@aws-amplify/core": "5.0.9",

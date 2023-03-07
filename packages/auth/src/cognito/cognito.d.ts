@@ -9,3 +9,4 @@ export { confirmSignUp } from './commands/confirmSignUp';
 export { confirmSignIn } from './commands/confirmSignIn';
 export { setupTOTP } from './commands/setupTotp';
 export { verifyTOTP } from './commands/verifyTotp';
+export { useHttpOnlyCookies } from './utils/HttpOnlyCookies';

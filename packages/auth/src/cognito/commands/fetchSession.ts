@@ -26,13 +26,20 @@ export async function fetchSession(sessionParams?: SessionParams) {
 				!isTokenValid({ token: accessToken }) ||
 				!isTokenValid({ token: idToken })
 			) {
-				const refreshedUser = await refreshTokens({
-					refreshToken,
-					clientId: amplifyConfig.Auth.userPoolWebClientId,
-					region: amplifyConfig.Auth.region,
-				});
+				if (!Amplify.getContext().Auth.httpOnlyCookieConfig) {
+					const refreshedUser = await refreshTokens({
+						refreshToken,
+						clientId: amplifyConfig.Auth.userPoolWebClientId,
+						region: amplifyConfig.Auth.region,
+					});
 
-				tokens = { ...refreshedUser, clockDrift: 0 };
+					tokens = { ...refreshedUser, clockDrift: 0 };
+				} else {
+					await Amplify.getContext()
+						.Auth.httpOnlyCookieRefreshHandler
+						// `${keyPrefix}.${username}.refreshToken`
+						();
+				}
 			}
 		}
 

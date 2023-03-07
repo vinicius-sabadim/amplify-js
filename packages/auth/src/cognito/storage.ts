@@ -8,26 +8,34 @@ export function cacheTokens({
 	username,
 	userPoolClientID,
 }) {
-	let _storage;
-	const amplifyConfig = Amplify.getConfig();
-	if (amplifyConfig?.ssr) {
-		_storage = new UniversalStorage();
-	} else {
-		_storage = new StorageHelper().getStorage();
-	}
+	let _storage = new UniversalStorage();
+	// const amplifyConfig = Amplify.getConfig();
+	// if (amplifyConfig?.ssr) {
+	// 	_storage = new UniversalStorage();
+	// } else {
+	// 	_storage = new StorageHelper().getStorage();
+	// }
 
 	const keyPrefix = `CognitoIdentityServiceProvider.${userPoolClientID}`;
 	const idTokenKey = `${keyPrefix}.${username}.idToken`;
 	const accessTokenKey = `${keyPrefix}.${username}.accessToken`;
-	const refreshTokenKey = `${keyPrefix}.${username}.refreshToken`;
 	const clockDriftKey = `${keyPrefix}.${username}.clockDrift`;
 	const lastUserKey = `${keyPrefix}.LastAuthUser`;
 
 	_storage.setItem(idTokenKey, idToken);
 	_storage.setItem(accessTokenKey, accessToken);
-	_storage.setItem(refreshTokenKey, refreshToken);
 	_storage.setItem(clockDriftKey, `${clockDrift}`);
 	_storage.setItem(lastUserKey, username);
+
+	if (!Amplify.getContext().Auth.httpOnlyCookieConfig) {
+		const refreshTokenKey = `${keyPrefix}.${username}.refreshToken`;
+		_storage.setItem(refreshTokenKey, refreshToken);
+	} else {
+		Amplify.getContext().Auth.httpOnlyCookieConfig.tokenConversionHandler(
+			`${keyPrefix}.${username}.refreshToken`,
+			refreshToken
+		);
+	}
 }
 
 export function readTokens({

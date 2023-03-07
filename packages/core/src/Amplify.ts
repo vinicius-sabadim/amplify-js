@@ -143,9 +143,9 @@ export class AmplifyClass {
 			comp.configure(this._config);
 		});
 
-		this._configListeners.forEach(listener =>
-			listener(JSON.parse(JSON.stringify(this._config)))
-		);
+		// this._configListeners.forEach(listener =>
+		// 	listener(JSON.parse(JSON.stringify(this._config)))
+		// );
 		return this._config;
 	}
 
