@@ -26,7 +26,13 @@ export const fetchTransferClient: TransferClient<
 		});
 		const httpResponse = {
 			statusCode: resp.status,
-			headers: resp.headers,
+			headers: Array.from(resp.headers.entries()).reduce(
+				(prev, [key, value]) => {
+					prev[key.toLowerCase()] = value;
+					return prev;
+				},
+				{} as Record<string, string>
+			), // TODO: or use Object.fromEntries if Node.js 12 is supported.
 			body: null,
 		};
 		if (resp.body) {

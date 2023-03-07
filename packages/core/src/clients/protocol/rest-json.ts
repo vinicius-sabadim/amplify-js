@@ -30,7 +30,7 @@ export const throwError = async (response: HttpResponse): Promise<never> => {
 		return cleanValue;
 	};
 	const code = sanitizeErrorCode(
-		response.headers.get('x-amzn-errortype') ??
+		response.headers['x-amzn-errortype'] ??
 			body.code ??
 			body.__type ??
 			'UnknownError'

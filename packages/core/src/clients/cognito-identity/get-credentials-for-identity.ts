@@ -18,10 +18,10 @@ const getCredentialsForIdentitySerializer = async (
 	endpoint: Endpoint
 ): Promise<HttpRequest> => {
 	return {
-		headers: new Headers({
+		headers: {
 			'content-type': 'application/x-amz-json-1.1',
 			'x-amz-target': 'AWSCognitoIdentityService.GetCredentialsForIdentity',
-		}),
+		},
 		method: 'POST',
 		destination: endpoint.url,
 		body: JSON.stringify(input),

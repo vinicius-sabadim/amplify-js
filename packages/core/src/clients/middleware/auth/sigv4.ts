@@ -2,7 +2,7 @@
 import { Sha256 } from '@aws-crypto/sha256-js'; // Use this for v5
 import { toHex } from '@aws-sdk/util-hex-encoding';
 import { Middleware, SideEffectReference } from '../../types/core';
-import { HttpRequest, HttpResponse } from '../../types/http';
+import { HttpRequest, HttpResponse, Headers } from '../../types/http';
 import { Credentials, SourceData } from '../../types/aws';
 
 /**
@@ -46,11 +46,11 @@ export const signRequest = async (
 	const credential = await options.credentialsProvider();
 
 	const copiedUrl = new URL(destination.toString());
-	const copiedHeaders = new Headers(headers);
-	copiedHeaders.set('host', copiedUrl.host);
-	copiedHeaders.set('x-amz-date', date);
+	const copiedHeaders = { ...headers };
+	copiedHeaders['host'] = copiedUrl.host;
+	copiedHeaders['x-amz-date'] = date;
 	if (credential.sessionToken) {
-		copiedHeaders.set('x-amz-security-token', credential.sessionToken);
+		copiedHeaders['x-amz-security-token'] = credential.sessionToken;
 	}
 
 	// 1: create canonical request
@@ -76,7 +76,7 @@ export const signRequest = async (
 		signedHeaders(copiedHeaders),
 		signature
 	);
-	copiedHeaders.set('Authorization', authHeader);
+	copiedHeaders['Authorization'] = authHeader;
 
 	return {
 		...request,
@@ -130,7 +130,7 @@ const escapeRfc3986 = (component: string): string => {
 };
 
 const canonicalHeaders = (headers: Headers): string => {
-	const headerEntries = Array.from(headers.entries());
+	const headerEntries = Object.entries(headers);
 	if (headerEntries.length === 0) {
 		return '';
 	}
@@ -148,7 +148,7 @@ const canonicalHeaders = (headers: Headers): string => {
 
 // TODO: filter out signable headers
 const signedHeaders = (headers: Headers): string => {
-	return Array.from(headers.keys())
+	return Object.keys(headers)
 		.map(key => key.toLowerCase())
 		.sort()
 		.join(';');

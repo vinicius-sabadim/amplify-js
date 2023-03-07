@@ -7,6 +7,11 @@ export type Method =
 	| 'PUT'
 	| 'DELETE'; /** skip "CONNECT" |  "OPTIONS" |  "TRACE"**/
 
+/**
+ * Use basic Record interface to workaround fetch Header class not available in Node.js
+ */
+export type Headers = Record<Lowercase<string>, string>;
+
 export interface HttpRequest extends Request {
 	method: Method;
 	/**
@@ -14,7 +19,7 @@ export interface HttpRequest extends Request {
 	 * `fields` is a collection of headers and body trailers to support {@link https://smithy.io/2.0/aws/aws-core.html?highlight=httpchecksum#aws-protocols-httpchecksum-trait httpChecksum trait}
 	 * which is essentially an S3-only feature.
 	 */
-	headers: Headers;
+	headers: Record<Lowercase<string>, string>;
 }
 
 /**
