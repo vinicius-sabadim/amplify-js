@@ -1,4 +1,8 @@
-import { Endpoint } from './core';
+import {
+	Endpoint,
+	Request as RequestBase,
+	Response as ResponseBase,
+} from './core';
 
 export interface Credentials {
 	accessKeyId: string;
@@ -9,6 +13,11 @@ export interface Credentials {
 
 export type SourceData = string | ArrayBuffer | ArrayBufferView;
 
-export type ServiceClientOptions = {
+export type ServiceClientOptions<
+	Request extends RequestBase,
+	Response extends ResponseBase
+> = {
+	modifyAfterSerialization?: (input: Request) => Promise<Request>;
+	modifyBeforeDeserialization?: (input: Response) => Promise<Response>;
 	endpointProvider: () => Promise<Endpoint>;
 };

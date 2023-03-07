@@ -79,9 +79,18 @@ export const composeServiceApi =
 		serializer: (input: Input, endpoint: Endpoint) => Promise<Request>,
 		deserializer: (output: Response) => Promise<Output>
 	) =>
-	async (context: ServiceContext & ServiceClientOptions, input: Input) => {
+	async (
+		context: ServiceContext & ServiceClientOptions<Request, Response>,
+		input: Input
+	) => {
 		const endpoint = await context.endpointProvider();
-		const request = await serializer(input, endpoint);
-		const response = await transferClient.send(request, context);
+		let request = await serializer(input, endpoint);
+		if (context.modifyAfterSerialization) {
+			request = await context.modifyAfterSerialization(request);
+		}
+		let response = await transferClient.send(request, context);
+		if (context.modifyBeforeDeserialization) {
+			response = await context.modifyBeforeDeserialization(response);
+		}
 		return await deserializer(response);
 	};
