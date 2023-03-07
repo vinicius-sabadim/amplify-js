@@ -1,4 +1,4 @@
-export const getContext = (options: { region: string }) => ({
+export const getDefaultContext = (options: { region: string }) => ({
 	service: 'cloudwatch',
 	endpointProvider: () =>
 		Promise.resolve({

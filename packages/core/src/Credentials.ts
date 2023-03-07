@@ -6,7 +6,7 @@ import { jitteredExponentialRetry } from './Util';
 import { ICredentials } from './types';
 import { Amplify } from './Amplify';
 import {
-	getContext,
+	getDefaultContext,
 	getId,
 	getCredentialsForIdentity,
 } from './clients/cognito-identity';
@@ -286,7 +286,7 @@ export class CredentialsClass {
 				'region is not configured for getting the credentials'
 			);
 		}
-		const cognitoIdentityServiceContext = getContext({ region });
+		const cognitoIdentityServiceContext = getDefaultContext({ region });
 
 		const identityId = (this._identityId = await this._getGuestIdentityId());
 
@@ -377,7 +377,7 @@ export class CredentialsClass {
 				'region is not configured for getting the credentials'
 			);
 		}
-		const cognitoIdentityServiceContext = getContext({ region });
+		const cognitoIdentityServiceContext = getDefaultContext({ region });
 
 		let credentials: CredentialsResponse | undefined = undefined;
 		let identityId: string | undefined = undefined;
@@ -419,7 +419,7 @@ export class CredentialsClass {
 				'region is not configured for getting the credentials'
 			);
 		}
-		const cognitoIdentityServiceContext = getContext({
+		const cognitoIdentityServiceContext = getDefaultContext({
 			region: identityPoolRegion || region,
 		});
 		const key = 'cognito-idp.' + region + '.amazonaws.com/' + userPoolId;

@@ -3,7 +3,7 @@ import { HttpRequest } from '../types/http';
 export * from './get-id';
 export * from './get-credentials-for-identity';
 
-export const getContext = (options: { region: string }) => ({
+export const getDefaultContext = (options: { region: string }) => ({
 	service: 'cognito-identity',
 	endpointProvider: () =>
 		Promise.resolve({
