@@ -66,7 +66,7 @@ class SyncProcessor {
 						'LIST'
 					);
 
-					if (model.queries?.sync) {
+					if (!!model.queries?.sync?.document) {
 						opNameQuery = [
 							model.queries?.sync.fieldName,
 							model.queries?.sync.document,

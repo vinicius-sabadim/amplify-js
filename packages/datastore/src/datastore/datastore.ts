@@ -76,6 +76,8 @@ import {
 	ModelPredicateExtender,
 	ModelFields,
 	OpType,
+	MetadataOrDefault,
+	DefaultPersistentModelMetaData,
 } from '../types';
 // tslint:disable:no-duplicate-imports
 import type { __modelMeta__ } from '../types';
@@ -2623,18 +2625,48 @@ class DataStore {
 const instance = new DataStore();
 Amplify.register(instance);
 
+type Flatten<T> = T extends object
+	? {
+			[P in keyof T]: Flatten<T[P]>;
+	  }
+	: T;
+type ScalarTypes = keyof Omit<
+	typeof GraphQLScalarType,
+	'getJSType' | 'getValidationFunction'
+>;
+
+type MappedGraphQLType<T extends ScalarTypes> = T extends
+	| 'ID'
+	| 'String'
+	| 'AWSJson'
+	| 'AWSDate'
+	| 'AWSTime'
+	| 'AWSDateTime'
+	| 'AWSTimestamp'
+	| 'AWSEmail'
+	| 'AWSJSON'
+	| 'AWSURL'
+	| 'AWSPhone'
+	| 'AWSIPAddress'
+	? string
+	: T extends 'Int' | 'Float'
+	? number
+	: T extends 'Boolean'
+	? boolean
+	: never;
+
 type OperationDocumentTuple = { fieldName: string; document: string };
 const builders = new Map<
-	ModelBuilder,
+	ModelBuilder<any>,
 	{
 		queries: {
 			sync?: OperationDocumentTuple;
 			mutations: Partial<Record<OpType, OperationDocumentTuple>>;
 		};
-		fields: Record<string, { type?: ModelField['type'] }>;
+		fields: Record<string, { type?: ScalarTypes }>;
 	}
 >();
-export class ModelBuilder {
+export class ModelBuilder<T extends Record<string, any> = {}> {
 	static instance() {
 		const instance = new ModelBuilder();
 
@@ -2643,37 +2675,60 @@ export class ModelBuilder {
 		return instance;
 	}
 
-	field(name: string, type?: ModelField['type']) {
-		builders.get(this)!.fields[name] = { type };
+	field<FN extends string, FT extends ScalarTypes>(
+		name: FN,
+		type: FT
+	): ModelBuilder<
+		Flatten<
+			T & {
+				[name in FN]: MappedGraphQLType<FT>;
+			}
+		>
+	> {
+		builders.get(this)!.fields[name] = { type: type ?? 'String' };
 
 		return this;
 	}
 	hasMany(name: string) {
 		return this;
 	}
-	syncQuery(fieldName: string, document: string) {
+	syncQuery(fieldName: string, document: string): ModelBuilder<T> {
 		builders.get(this)!.queries.sync = { fieldName, document };
 		return this;
 	}
-	mutations(mutations: Partial<Record<OpType, OperationDocumentTuple>>) {
-		Object.entries(mutations).forEach(([opType, { fieldName, document }]) => {
-			builders.get(this)!.queries.mutations[opType] = { fieldName, document };
-		});
+	mutations(
+		mutations: Partial<{
+			[k in OpType]: OperationDocumentTuple;
+		}>
+	): ModelBuilder<T> {
+		Object.entries(mutations).forEach(
+			([
+				opType,
+				{ fieldName, document } = { fieldName: undefined, document: undefined },
+			]) => {
+				builders.get(this)!.queries.mutations[opType] = { fieldName, document };
+			}
+		);
 
 		return this;
 	}
 }
 
 export class DataStoreRuntimeContext {
-	static create<T extends Record<string, ModelBuilder>>(
+	static create<T extends Record<string, ModelBuilder<any>>>(
 		schema: T
-	): Record<keyof T, PersistentModelConstructor<any>> {
-		console.log(Array.from(builders.entries()));
-
+	): Record<
+		keyof T,
+		PersistentModelConstructor<
+			T[keyof T] extends ModelBuilder<infer G>
+				? G & { [__modelMeta__]: DefaultPersistentModelMetaData }
+				: never
+		>
+	> {
 		const mipr: Schema = {
 			models: {},
-			version: '1.2',
-			codegenVersion: '3.4',
+			version: '1.2', // hash
+			codegenVersion: '3.4', // ?
 			enums: {},
 		};
 
