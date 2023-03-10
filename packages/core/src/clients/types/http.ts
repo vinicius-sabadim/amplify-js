@@ -1,11 +1,6 @@
 import { Request, Response, TransferClient } from './core';
 
-export type Method =
-	| 'GET'
-	| 'HEAD'
-	| 'POST'
-	| 'PUT'
-	| 'DELETE'; /** skip "CONNECT" |  "OPTIONS" |  "TRACE"**/
+export type Method = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE';
 
 /**
  * Use basic Record interface to workaround fetch Header class not available in Node.js

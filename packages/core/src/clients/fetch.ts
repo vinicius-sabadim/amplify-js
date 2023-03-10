@@ -4,8 +4,8 @@ import {
 	HttpResponse,
 	HttpTransferOptions,
 	Method,
-} from '../types/http';
-import { TransferClient } from '../types/core';
+} from './types/http';
+import { TransferClient } from './types/core';
 
 const shouldSendBody = (method: Method) =>
 	!['HEAD', 'GET', 'DELETE'].includes(method);

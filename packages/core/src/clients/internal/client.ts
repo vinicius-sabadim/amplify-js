@@ -7,6 +7,7 @@ import {
 	Response as ResponseBase,
 	Endpoint,
 } from '../types/core';
+import { HttpRequest, HttpResponse } from '../types/http';
 
 type OptionToMiddleware<
 	Request,
@@ -40,19 +41,25 @@ type MergeNoConflictKeys<Options extends any[]> = Options extends [
 	? MergeTwoNoConflictKeys<FirstOption, MergeNoConflictKeys<RestOptions>>
 	: never;
 
+type InferOptionTypeFromTransferClient<
+	T extends TransferClient<any, any, any>
+> = Parameters<T['send']>[1];
+
 export const composeTransferClient = <
 	Request extends RequestBase,
 	Response extends ResponseBase,
-	TransferOptions,
+	CoreClient extends TransferClient<Request, Response, any>,
 	MiddlewareOptionsArr extends any[]
 >(
-	coreClient: TransferClient<Request, Response, TransferOptions>,
+	coreClient: CoreClient,
 	middleware: OptionToMiddleware<Request, Response, MiddlewareOptionsArr>
 ) => {
 	return {
 		send: (
 			request: Request,
-			options: MergeNoConflictKeys<[...MiddlewareOptionsArr, TransferOptions]>
+			options: MergeNoConflictKeys<
+				[...MiddlewareOptionsArr, InferOptionTypeFromTransferClient<CoreClient>]
+			>
 		) => {
 			let composedHandler = coreClient.send as unknown as MiddlewareHandler<
 				Request,
@@ -67,30 +74,49 @@ export const composeTransferClient = <
 	};
 };
 
-export const composeServiceApi =
-	<
-		Input,
-		Output,
-		Request extends RequestBase,
-		Response extends ResponseBase,
-		ServiceContext
-	>(
-		transferClient: TransferClient<Request, Response, ServiceContext>,
-		serializer: (input: Input, endpoint: Endpoint) => Promise<Request>,
-		deserializer: (output: Response) => Promise<Output>
-	) =>
-	async (
-		context: ServiceContext & ServiceClientOptions<Request, Response>,
+type OptionalizeKey<T, K> = Omit<T, K & keyof T> & {
+	[P in K & keyof T]?: T[P];
+};
+export const composeServiceApi = <
+	Input,
+	Output,
+	TransferClientOptions,
+	DefaultConfig extends Partial<TransferClientOptions & ServiceClientOptions>
+>(
+	transferClient: TransferClient<
+		HttpRequest,
+		HttpResponse,
+		TransferClientOptions
+	>,
+	serializer: (input: Input, endpoint: Endpoint) => Promise<HttpRequest>,
+	deserializer: (output: HttpResponse) => Promise<Output>,
+	defaultConfig: DefaultConfig
+) => {
+	return async (
+		config: OptionalizeKey<
+			TransferClientOptions & ServiceClientOptions,
+			keyof DefaultConfig
+		>,
 		input: Input
 	) => {
-		const endpoint = await context.endpointProvider();
+		const resolvedConfig = {
+			...defaultConfig,
+			...config,
+		} as unknown as TransferClientOptions & ServiceClientOptions;
+
+		// For S3 access point, the endpoint can be configured by both configure and input.
+		const endpoint = await resolvedConfig.endpointResolver({
+			...resolvedConfig,
+			...input,
+		});
 		let request = await serializer(input, endpoint);
-		if (context.modifyAfterSerialization) {
-			request = await context.modifyAfterSerialization(request);
+		if (config.modifyAfterSerialization) {
+			request = await config.modifyAfterSerialization(request);
 		}
-		let response = await transferClient.send(request, context);
-		if (context.modifyBeforeDeserialization) {
-			response = await context.modifyBeforeDeserialization(response);
+		let response = await transferClient.send(request, resolvedConfig);
+		if (config.modifyBeforeDeserialization) {
+			response = await config.modifyBeforeDeserialization(response);
 		}
 		return await deserializer(response);
 	};
+};

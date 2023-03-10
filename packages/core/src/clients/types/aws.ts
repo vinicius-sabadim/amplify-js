@@ -1,8 +1,5 @@
-import {
-	Endpoint,
-	Request as RequestBase,
-	Response as ResponseBase,
-} from './core';
+import { Endpoint } from './core';
+import { HttpRequest, HttpResponse } from './http';
 
 export interface Credentials {
 	accessKeyId: string;
@@ -13,11 +10,12 @@ export interface Credentials {
 
 export type SourceData = string | ArrayBuffer | ArrayBufferView;
 
-export type ServiceClientOptions<
-	Request extends RequestBase,
-	Response extends ResponseBase
-> = {
-	modifyAfterSerialization?: (input: Request) => Promise<Request>;
-	modifyBeforeDeserialization?: (input: Response) => Promise<Response>;
-	endpointProvider: () => Promise<Endpoint>;
-};
+export type ServiceClientOptions<EndpointResolverOptions = { region: string }> =
+	{
+		region: string;
+		modifyAfterSerialization?: (input: HttpRequest) => Promise<HttpRequest>;
+		modifyBeforeDeserialization?: (
+			input: HttpResponse
+		) => Promise<HttpResponse>;
+		endpointResolver: (input: EndpointResolverOptions) => Endpoint;
+	};
