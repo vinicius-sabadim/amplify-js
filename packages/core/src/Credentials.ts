@@ -11,8 +11,6 @@ import {
 } from './aws-clients/cognito-identity';
 import { parseAWSExports } from './parseAWSExports';
 import { Hub } from './Hub';
-import { ServiceClientOptions } from './clients/types/aws';
-import { HttpRequest, HttpResponse } from './clients/types/http';
 
 type CredentialsResponse = Omit<ICredentials, 'authenticated' | 'identityId'>;
 

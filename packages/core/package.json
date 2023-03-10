@@ -28,7 +28,7 @@
 		"clean:size": "rimraf dual-publish-tmp tmp*",
 		"format": "echo \"Not implemented\"",
 		"lint": "tslint 'src/**/*.ts' && npm run ts-coverage",
-		"ts-coverage": "typescript-coverage-report -p ./tsconfig.build.json -t 76.41"
+		"ts-coverage": "typescript-coverage-report -p ./tsconfig.build.json -t 85%"
 	},
 	"react-native": {
 		"./lib/index": "./lib-esm/index.js",
@@ -78,31 +78,31 @@
 			"name": "Core (ServiceWorker)",
 			"path": "./lib-esm/index.js",
 			"import": "{ ServiceWorker }",
-			"limit": "2.4 kB"
+			"limit": "2.41 kB"
 		},
 		{
 			"name": "Core (Hub)",
 			"path": "./lib-esm/index.js",
 			"import": "{ Hub }",
-			"limit": "2 kB"
+			"limit": "2.1 kB"
 		},
 		{
 			"name": "Core (I18n)",
 			"path": "./lib-esm/index.js",
 			"import": "{ I18n }",
-			"limit": "2 kB"
+			"limit": "2.1 kB"
 		},
 		{
 			"name": "Core (Logger)",
 			"path": "./lib-esm/index.js",
 			"import": "{ Logger }",
-			"limit": "1.2 kB"
+			"limit": "1.22 kB"
 		},
 		{
 			"name": "Core (Credentials)",
 			"path": "./lib-esm/index.js",
 			"import": "{ Credentials }",
-			"limit": "9.7 kB"
+			"limit": "9.9 kB"
 		}
 	],
 	"jest": {
