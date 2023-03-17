@@ -2,7 +2,7 @@ import type {
 	GetCredentialsForIdentityCommandInput,
 	GetCredentialsForIdentityCommandOutput,
 } from '@aws-sdk/client-cognito-identity';
-import { cognitoIdentityTransferClient, defaultConfigs } from './base';
+import { cognitoIdentityTransferHandler, defaultConfigs } from './base';
 import {
 	composeServiceApi,
 	Endpoint,
@@ -51,7 +51,7 @@ const getCredentialsForIdentityDeserializer = async (
 };
 
 export const getCredentialsForIdentity = composeServiceApi(
-	cognitoIdentityTransferClient,
+	cognitoIdentityTransferHandler,
 	getCredentialsForIdentitySerializer,
 	getCredentialsForIdentityDeserializer,
 	defaultConfigs

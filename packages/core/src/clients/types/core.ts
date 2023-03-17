@@ -10,8 +10,8 @@ export interface Response {
 	body: unknown;
 }
 
-export interface TransferClient<Request, Response, TransferOptions> {
-	send: (request: Request, options: TransferOptions) => Promise<Response>;
+export interface TransferHandler<Request, Response, TransferOptions> {
+	(request: Request, options: TransferOptions): Promise<Response>;
 }
 
 /**

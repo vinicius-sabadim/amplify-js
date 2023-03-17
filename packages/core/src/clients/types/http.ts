@@ -1,4 +1,5 @@
-import { Request, Response, TransferClient } from './core';
+import { Request, Response, TransferHandler } from './core';
+import { Agent } from 'https';
 
 export type Method = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE';
 
@@ -47,7 +48,7 @@ export interface HttpTransferOptions {
 	abortSignal?: AbortSignal;
 }
 
-export type HttpTransferClient = TransferClient<
+export type HttpTransferHandler = TransferHandler<
 	HttpRequest,
 	HttpResponse,
 	HttpTransferOptions

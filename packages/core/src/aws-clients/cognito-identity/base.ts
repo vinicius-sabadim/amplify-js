@@ -1,6 +1,6 @@
 import {
-	httpTransferClient,
-	composeTransferClient,
+	httpTransferHandler,
+	composeTransferHandler,
 	Middleware,
 	HttpRequest,
 	HttpResponse,
@@ -15,12 +15,12 @@ const disableCacheMiddleware: Middleware<HttpRequest, HttpResponse, {}> = (
 		return next(request, context);
 	};
 
-export const cognitoIdentityTransferClient = composeTransferClient<
+export const cognitoIdentityTransferHandler = composeTransferHandler<
 	HttpRequest,
 	HttpResponse,
-	typeof httpTransferClient,
+	typeof httpTransferHandler,
 	[{}]
->(httpTransferClient, [disableCacheMiddleware]);
+>(httpTransferHandler, [disableCacheMiddleware]);
 
 export const defaultConfigs = {
 	service: 'cognito-identity',

@@ -1,12 +1,12 @@
 import { jitteredBackOffRetry, RetryOptions } from './middleware/retry';
-import { composeTransferClient } from './internal/client';
-import { fetchTransferClient } from './fetch';
+import { composeTransferHandler } from './internal/client';
+import { fetchTransferHandler } from './fetch';
 import { HttpRequest, HttpResponse } from './types/http';
 import { userAgent, UserAgentOptions } from './middleware/user-agent';
 
-export const httpTransferClient = composeTransferClient<
+export const httpTransferHandler = composeTransferHandler<
 	HttpRequest,
 	HttpResponse,
-	typeof fetchTransferClient,
+	typeof fetchTransferHandler,
 	[RetryOptions, UserAgentOptions]
->(fetchTransferClient, [jitteredBackOffRetry(), userAgent]);
+>(fetchTransferHandler, [jitteredBackOffRetry(), userAgent]);

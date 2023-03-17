@@ -2,7 +2,7 @@ import { ServiceClientOptions } from '../types/aws';
 import {
 	Middleware,
 	MiddlewareHandler,
-	TransferClient,
+	TransferHandler,
 	Request as RequestBase,
 	Response as ResponseBase,
 	Endpoint,
@@ -41,38 +41,36 @@ type MergeNoConflictKeys<Options extends any[]> = Options extends [
 	? MergeTwoNoConflictKeys<FirstOption, MergeNoConflictKeys<RestOptions>>
 	: never;
 
-type InferOptionTypeFromTransferClient<
-	T extends TransferClient<any, any, any>
-> = Parameters<T['send']>[1];
+type InferOptionTypeFromTransferHandler<
+	T extends TransferHandler<any, any, any>
+> = Parameters<T>[1];
 
-export const composeTransferClient = <
-	Request extends RequestBase,
-	Response extends ResponseBase,
-	CoreClient extends TransferClient<Request, Response, any>,
-	MiddlewareOptionsArr extends any[]
->(
-	coreClient: CoreClient,
-	middleware: OptionToMiddleware<Request, Response, MiddlewareOptionsArr>
-) => {
-	return {
-		send: (
-			request: Request,
-			options: MergeNoConflictKeys<
-				[...MiddlewareOptionsArr, InferOptionTypeFromTransferClient<CoreClient>]
-			>
-		) => {
-			let composedHandler = coreClient.send as unknown as MiddlewareHandler<
-				Request,
-				Response,
-				MiddlewareOptionsArr[number]
-			>;
-			for (const m of middleware.reverse()) {
-				composedHandler = m(composedHandler, {});
-			}
-			return composedHandler(request, options);
-		},
+export const composeTransferHandler =
+	<
+		Request extends RequestBase,
+		Response extends ResponseBase,
+		CoreHandler extends TransferHandler<Request, Response, any>,
+		MiddlewareOptionsArr extends any[]
+	>(
+		coreHandler: CoreHandler,
+		middleware: OptionToMiddleware<Request, Response, MiddlewareOptionsArr>
+	) =>
+	(
+		request: Request,
+		options: MergeNoConflictKeys<
+			[...MiddlewareOptionsArr, InferOptionTypeFromTransferHandler<CoreHandler>]
+		>
+	) => {
+		let composedHandler = coreHandler as unknown as MiddlewareHandler<
+			Request,
+			Response,
+			MiddlewareOptionsArr[number]
+		>;
+		for (const m of middleware.reverse()) {
+			composedHandler = m(composedHandler, {});
+		}
+		return composedHandler(request, options);
 	};
-};
 
 type OptionalizeKey<T, K> = Omit<T, K & keyof T> & {
 	[P in K & keyof T]?: T[P];
@@ -80,13 +78,13 @@ type OptionalizeKey<T, K> = Omit<T, K & keyof T> & {
 export const composeServiceApi = <
 	Input,
 	Output,
-	TransferClientOptions,
-	DefaultConfig extends Partial<TransferClientOptions & ServiceClientOptions>
+	TransferHandlerOptions,
+	DefaultConfig extends Partial<TransferHandlerOptions & ServiceClientOptions>
 >(
-	transferClient: TransferClient<
+	transferHandler: TransferHandler<
 		HttpRequest,
 		HttpResponse,
-		TransferClientOptions
+		TransferHandlerOptions
 	>,
 	serializer: (input: Input, endpoint: Endpoint) => Promise<HttpRequest>,
 	deserializer: (output: HttpResponse) => Promise<Output>,
@@ -94,7 +92,7 @@ export const composeServiceApi = <
 ) => {
 	return async (
 		config: OptionalizeKey<
-			TransferClientOptions & ServiceClientOptions,
+			TransferHandlerOptions & ServiceClientOptions,
 			keyof DefaultConfig
 		>,
 		input: Input
@@ -102,7 +100,7 @@ export const composeServiceApi = <
 		const resolvedConfig = {
 			...defaultConfig,
 			...config,
-		} as unknown as TransferClientOptions & ServiceClientOptions;
+		} as unknown as TransferHandlerOptions & ServiceClientOptions;
 
 		// For S3 access point, the endpoint can be configured by both configure and input.
 		const endpoint = await resolvedConfig.endpointResolver({
@@ -113,7 +111,7 @@ export const composeServiceApi = <
 		if (config.modifyAfterSerialization) {
 			request = await config.modifyAfterSerialization(request);
 		}
-		let response = await transferClient.send(request, resolvedConfig);
+		let response = await transferHandler(request, resolvedConfig);
 		if (config.modifyBeforeDeserialization) {
 			response = await config.modifyBeforeDeserialization(response);
 		}
