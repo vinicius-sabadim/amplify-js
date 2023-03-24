@@ -16,9 +16,11 @@ export type AmplifyUser = {
 };
 
 type AmplifyUserCallback = (user: AmplifyUser) => void;
+type GetAccessToken = () => string;
 
 export type AmplifyContext = {
 	Auth?: any;
+	getAccessToken?: GetAccessToken;
 };
 
 export class AmplifyClass {
@@ -67,9 +69,11 @@ export class AmplifyClass {
 		return this._context;
 	}
 
-	setContext(category: String, content) {
-		if (category === 'Auth') {
+	setContext(key: String, content) {
+		if (key === 'Auth') {
 			this._context.Auth = content;
+		} else if (key === 'getAccessToken') {
+			this._context.getAccessToken = content;
 		}
 	}
 

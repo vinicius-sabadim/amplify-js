@@ -26,7 +26,10 @@ export const query = async (
 		userAgentSuffix,
 	} = options;
 	const config = Amplify.getConfig();
+	console.log('config', config);
 	const amplifyConfig = parseAWSExports(config) as any;
+	console.log('amplifyConfig', amplifyConfig);
+
 	const storageConfig = amplifyConfig.Storage;
 	const appSyncRegion = config.aws_appsync_region;
 	const appSyncAuthMode = authMode || config.aws_appsync_authenticationType;
@@ -40,6 +43,8 @@ export const query = async (
 	const query = paramQuery;
 
 	const customHeaders = additionalHeaders || {};
+	console.group('additionalHeaders', additionalHeaders);
+	console.group('customHeaders', customHeaders);
 	if (authToken) {
 		customHeaders.Authorization = authToken;
 	}
@@ -97,7 +102,6 @@ export const query = async (
 	// Submit query
 	let response;
 	let requestAuthMode: 'JWT' | 'SigV4' | 'None' = 'None';
-	let customHeader = {};
 
 	if (
 		appSyncAuthMode === 'AMAZON_COGNITO_USER_POOLS' ||
@@ -112,10 +116,22 @@ export const query = async (
 	}
 
 	if (appSyncAuthMode === 'API_KEY') {
-		customHeader['x-api-key'] = apiKey;
+		customHeaders['x-api-key'] = apiKey;
 	}
 
 	try {
+		const request = {
+			endpoint,
+			method: 'POST',
+			body: payload.body,
+			region: payload.signerServiceInfo.region,
+			service: payload.signerServiceInfo.service,
+			authMode: requestAuthMode,
+			headers: { ...customHeaders },
+		};
+
+		console.log('request', request);
+
 		response = await httpClient({
 			endpoint,
 			method: 'POST',
@@ -123,7 +139,7 @@ export const query = async (
 			region: payload.signerServiceInfo.region,
 			service: payload.signerServiceInfo.service,
 			authMode: requestAuthMode,
-			headers: { ...customHeader },
+			headers: { ...customHeaders },
 		});
 
 		// response = await restClient.post(endpoint, payload);

@@ -15,7 +15,7 @@ export { Storage, StorageClass } from '@aws-amplify/storage';
 export { API, APIClass, graphqlOperation } from '@aws-amplify/api';
 export {
 	AuthModeStrategyType,
-	DataStore,
+	// DataStore,
 	Predicates,
 	SortDirection,
 	syncExpression,
@@ -35,6 +35,6 @@ export {
 	ServiceWorker,
 	AWSCloudWatchProvider,
 } from '@aws-amplify/core';
-export { withSSRContext } from './withSSRContext';
+// export { withSSRContext } from './withSSRContext';
 export { withFunctionalSSRContext } from './withFunctionalSSRContext';
 export { Geo } from '@aws-amplify/geo';

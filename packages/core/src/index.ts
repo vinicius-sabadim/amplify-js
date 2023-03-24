@@ -25,7 +25,7 @@ export {
 	transferKeyToLowerCase,
 	transferKeyToUpperCase,
 } from './JS';
-export { AmplifyUser } from './Amplify';
+export { AmplifyUser, AmplifyContext } from './Amplify';
 export { Signer, sign as SigV4HTTPRequestSigner } from './Signer';
 export { parseAWSExports } from './parseAWSExports';
 export { AWSCloudWatchProvider } from './Providers';
@@ -46,6 +46,8 @@ export {
 export const Constants = {
 	userAgent: Platform.userAgent,
 };
+
+export { initializeSSR } from './InitializeAmplifySSR';
 
 export {
 	AWS_CLOUDWATCH_BASE_BUFFER_SIZE,
@@ -70,6 +72,7 @@ export {
 	urlSafeEncode,
 	httpClient,
 	getSignedParams,
+	decodeTokenPayload,
 } from './Util';
 
 /**
