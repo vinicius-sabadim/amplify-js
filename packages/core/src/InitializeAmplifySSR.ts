@@ -1,13 +1,132 @@
 import { Amplify } from './Amplify';
 
-export function initializeSSR(req, res, config) {
-	Amplify.configure(config);
+export enum SSRType {
+	NEXTJS = 'NEXTJS',
+	NUXTJS = 'NUXTJS',
+	ASTRO = 'ASTRO',
+}
+
+export type AccessToken = string;
+
+export enum ProviderTypes {
+	COGNITO = 'CognitoIdentityServiceProvider',
+}
+
+export type initializeSSRInput = {
+	req: any;
+	res: any;
+	config: any;
+	tokenRetrieval: SSRType | AccessToken;
+};
+
+export function initializeSSR(
+	input: initializeSSRInput,
+	provider: ProviderTypes = ProviderTypes.COGNITO
+) {
+	Amplify.configure(input.config);
+
 	// Will need to store app client id and username as cookie to perform this lookup?
-	Amplify.setContext(
-		'getAccessToken',
-		() =>
-			req.cookies[
-				'CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken'
-			]
-	);
+	Amplify.setContext('getAccessToken', () => {
+		console.log('hit getAccessToken');
+		let accessToken;
+
+		const userKey: string = constructUserKey(provider);
+
+		switch (input.tokenRetrieval) {
+			case SSRType.NEXTJS:
+				var user: string = findNextJSCookie(input.req, userKey);
+				var accessTokenKey: string = constructAccessTokenKey(provider, user);
+				accessToken = findNextJSCookie(input.req, accessTokenKey);
+				break;
+			case SSRType.NUXTJS:
+				var user: string = findNuxtJSCookie(input.req, userKey);
+				var accessTokenKey: string = constructAccessTokenKey(provider, user);
+				accessToken = findNuxtJSCookie(input.req, accessTokenKey);
+				break;
+			case SSRType.ASTRO:
+				var user: string = input.req.cookies.get(userKey).value;
+				var accessTokenKey: string = constructAccessTokenKey(provider, user);
+				accessToken = input.req.cookies.get(accessTokenKey).value;
+		}
+		// if (req) {
+		// 	if (req.cookies) {
+		// 		console.log('hit req.cookies!!!');
+		// 		cookies =
+		// 			req.cookies[
+		// 				`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
+		// 			] ??
+		// 			req.cookies.get(
+		// 				`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
+		// 			).value;
+		// 		return cookies;
+		// 	}
+		// 	if (req.headers && req.headers.cookie) {
+		// 		console.log('hit req.headers!!!');
+
+		// 		cookies = parseCookies(req.headers.cookie)[
+		// 			`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
+		// 		];
+		// 		return cookies;
+		// 	}
+		// } else if (document && document.cookie) {
+		// 	console.log('hit document.cookie!!!');
+		// 	console.log('document.cookie', document.cookie);
+
+		// 	cookies = parseCookies(document.cookie)[
+		// 		`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
+		// 	];
+		// 	return cookies;
+		// }
+
+		return accessToken;
+	});
+}
+
+function findNextJSCookie(req: any, key: string) {
+	return req.cookies[key] ?? req.cookies.get(key).value;
+}
+
+function findNuxtJSCookie(req: any, key: string) {
+	return req?.headers.cookie
+		? parseCookies(req?.headers.cookie)[key]
+		: parseCookies(document?.cookie)[key];
+}
+
+function constructAccessTokenKey(provider: ProviderTypes, user: string) {
+	switch (provider) {
+		default:
+			const { aws_user_pools_web_client_id } = Amplify.getConfig();
+			return `${provider}.${aws_user_pools_web_client_id}.${user}.accessToken`;
+	}
+}
+
+function constructUserKey(provider: ProviderTypes) {
+	switch (provider) {
+		default:
+			const { aws_user_pools_web_client_id } = Amplify.getConfig();
+			return `${provider}.${aws_user_pools_web_client_id}.LastAuthUser`;
+	}
+}
+
+function parseCookies(cookieString): Object {
+	var cookies = {};
+	console.log('parseCookies: start', cookieString);
+
+	cookies = cookieString.split(';').reduce((res, c) => {
+		const [key, val] = c.trim().split('=').map(decodeURIComponent);
+		const allNumbers = str => /^\d+$/.test(str);
+		try {
+			return Object.assign(res, {
+				[key]: allNumbers(val) ? val : JSON.parse(val),
+			});
+		} catch (e) {
+			return Object.assign(res, { [key]: val });
+		}
+	}, {});
+	// for (var i = 0; i < cookieString.length; i++) {
+	// 	var nameValue = cookieString[i].split('=');
+	// 	cookies[nameValue[0].trim()] = nameValue[1];
+	// }
+	console.log('parseCookies: end', cookies);
+	return cookies;
 }
