@@ -4,6 +4,7 @@ export enum SSRType {
 	NEXTJS = 'NEXTJS',
 	NUXTJS = 'NUXTJS',
 	ASTRO = 'ASTRO',
+	SOLIDSTART = 'SOLIDSTART',
 }
 
 export type AccessToken = string;
@@ -47,37 +48,11 @@ export function initializeSSR(
 				var user: string = input.req.cookies.get(userKey).value;
 				var accessTokenKey: string = constructAccessTokenKey(provider, user);
 				accessToken = input.req.cookies.get(accessTokenKey).value;
+			case SSRType.SOLIDSTART:
+				var user: string = findSolidStartCookie(input.req, userKey);
+				var accessTokenKey: string = constructAccessTokenKey(provider, user);
+				accessToken = findSolidStartCookie(input.req, accessTokenKey);
 		}
-		// if (req) {
-		// 	if (req.cookies) {
-		// 		console.log('hit req.cookies!!!');
-		// 		cookies =
-		// 			req.cookies[
-		// 				`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
-		// 			] ??
-		// 			req.cookies.get(
-		// 				`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
-		// 			).value;
-		// 		return cookies;
-		// 	}
-		// 	if (req.headers && req.headers.cookie) {
-		// 		console.log('hit req.headers!!!');
-
-		// 		cookies = parseCookies(req.headers.cookie)[
-		// 			`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
-		// 		];
-		// 		return cookies;
-		// 	}
-		// } else if (document && document.cookie) {
-		// 	console.log('hit document.cookie!!!');
-		// 	console.log('document.cookie', document.cookie);
-
-		// 	cookies = parseCookies(document.cookie)[
-		// 		`CognitoIdentityServiceProvider.7d6fe2e3f9oj9frpk047q5nqlj.username.accessToken`
-		// 	];
-		// 	return cookies;
-		// }
-
 		return accessToken;
 	});
 }
@@ -90,6 +65,10 @@ function findNuxtJSCookie(req: any, key: string) {
 	return req?.headers.cookie
 		? parseCookies(req?.headers.cookie)[key]
 		: parseCookies(document?.cookie)[key];
+}
+
+function findSolidStartCookie(req: any, key: string) {
+	return parseCookies(req.headers.get('Cookie'))[key];
 }
 
 function constructAccessTokenKey(provider: ProviderTypes, user: string) {
