@@ -813,7 +813,7 @@ describe('DataStore sync engine', () => {
 			// 	expect.stringMatching(new RegExp('[ERROR].* Hub')),
 			// 	expect.anything()
 			// );
-			debugger;
+			// debugger;
 			expect(errorLog).not.toHaveBeenCalled();
 			await waitForEmptyOutbox();
 			const table = graphqlService.tables.get('Post')!;

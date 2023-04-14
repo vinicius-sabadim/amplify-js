@@ -77,8 +77,24 @@ export class FakeGraphQLService {
 			// debugger;
 		}
 
+		console.log('here------------------------');
+		console.log('type', type);
+		console.log(selection);
+		console.log(
+			'first result',
+			selection.match(/^(create|sync|get|list)(\w+)s$/)
+		);
+		console.log(
+			'second result',
+			selection.match(
+				/^(create|update|delete|sync|get|list|onCreate|onUpdate|onDelete)(\w+)$/
+			)
+		);
+
 		if (type === 'sync' || type === 'list') {
-			table = selection.match(/^(create|sync|get|list)(\w+)s$/)[2];
+			table = selection.match(
+				/^(create|sync|get|list|onCreate|onUpdate|onDelete)([A-Za-z]+)$/
+			)[2];
 		} else {
 			table = selection.match(
 				/^(create|update|delete|sync|get|list|onCreate|onUpdate|onDelete)(\w+)$/
