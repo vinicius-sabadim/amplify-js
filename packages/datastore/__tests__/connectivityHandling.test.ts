@@ -799,7 +799,7 @@ describe('DataStore sync engine', () => {
 			expect(cloudThirdPost.title).toEqual('a title 3');
 		});
 
-		test('does not error when disruption before sync queries start', async () => {
+		test.only('does not error when disruption before sync queries start', async () => {
 			const post = DataStore.save(
 				new Post({
 					title: 'a title',
@@ -809,10 +809,12 @@ describe('DataStore sync engine', () => {
 			await simulateDisruption();
 			await simulateDisruptionEnd();
 			await waitForSyncQueriesReady();
-			expect(errorLog).not.toHaveBeenCalledWith(
-				expect.stringMatching(new RegExp('[ERROR].* Hub')),
-				expect.anything()
-			);
+			// expect(errorLog).not.toHaveBeenCalledWith(
+			// 	expect.stringMatching(new RegExp('[ERROR].* Hub')),
+			// 	expect.anything()
+			// );
+			debugger;
+			expect(errorLog).not.toHaveBeenCalled();
 			await waitForEmptyOutbox();
 			const table = graphqlService.tables.get('Post')!;
 			expect(table.size).toEqual(1);

@@ -67,6 +67,16 @@ export class FakeGraphQLService {
 		)[1];
 
 		let table;
+		const result = selection.match(/^(create|sync|get|list)(\w+)s$/);
+		const result2 = selection.match(
+			/^(create|update|delete|sync|get|list|onCreate|onUpdate|onDelete)(\w+)$/
+		);
+		if (!result || result.length < 3) {
+			// debugger;
+		} else if (!result2 || result2.length < 3) {
+			// debugger;
+		}
+
 		if (type === 'sync' || type === 'list') {
 			table = selection.match(/^(create|sync|get|list)(\w+)s$/)[2];
 		} else {

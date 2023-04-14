@@ -224,10 +224,14 @@ class SyncProcessor {
 
 					// TODO: onTerminate.then(() => API.cancel(...))
 				} catch (error) {
+					console.log(error);
+					console.log('error!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
 					// Catch client-side (GraphQLAuthError) & 401/403 errors here so that we don't continue to retry
 					const clientOrForbiddenErrorMessage =
 						getClientSideAuthError(error) || getForbiddenError(error);
 					if (clientOrForbiddenErrorMessage) {
+						// This fails the test:
+						logger.error('test', error);
 						throw new NonRetryableError(clientOrForbiddenErrorMessage);
 					}
 
