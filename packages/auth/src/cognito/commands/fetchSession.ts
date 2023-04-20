@@ -36,7 +36,7 @@ export async function fetchSession(sessionParams?: SessionParams) {
 					tokens = { ...refreshedUser, clockDrift: 0 };
 				} else {
 					await Amplify.getContext()
-						.Auth.httpOnlyCookieRefreshHandler
+						.Auth.httpOnlyCookieConfig.httpOnlyCookieRefreshHandler
 						// `${keyPrefix}.${username}.refreshToken`
 						();
 				}

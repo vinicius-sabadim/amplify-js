@@ -1,4 +1,11 @@
-import { Amplify } from './Amplify';
+import {
+	CognitoIdentityClient,
+	Credentials,
+	GetCredentialsForIdentityCommand,
+	GetIdCommand,
+} from '@aws-sdk/client-cognito-identity';
+import { Amplify, AmplifyUser } from './Amplify';
+import { log } from 'console';
 
 export enum SSRType {
 	NEXTJS = 'NEXTJS',
@@ -13,48 +20,121 @@ export enum ProviderTypes {
 	COGNITO = 'CognitoIdentityServiceProvider',
 }
 
+enum JWTType {
+	ACCESS_TOKEN = 'accessToken',
+	ID_TOKEN = 'idToken',
+}
+
 export type initializeSSRInput = {
 	req: any;
+	// RES not always available, such as in NextJS Edge runtime
 	res: any;
 	config: any;
 	tokenRetrieval: SSRType | AccessToken;
 };
 
-export function initializeSSR(
+export async function initializeSSR(
 	input: initializeSSRInput,
 	provider: ProviderTypes = ProviderTypes.COGNITO
 ) {
 	Amplify.configure(input.config);
 
-	// Will need to store app client id and username as cookie to perform this lookup?
-	Amplify.setContext('getAccessToken', () => {
-		console.log('hit getAccessToken');
-		let accessToken;
+	Amplify.setUser(await deriveUserFromCookies(input, provider));
+}
 
-		const userKey: string = constructUserKey(provider);
+async function deriveUserFromCookies(
+	input: initializeSSRInput,
+	provider: ProviderTypes = ProviderTypes.COGNITO
+): Promise<AmplifyUser> {
+	let accessToken;
+	let idToken;
 
-		switch (input.tokenRetrieval) {
-			case SSRType.NEXTJS:
-				var user: string = findNextJSCookie(input.req, userKey);
-				var accessTokenKey: string = constructAccessTokenKey(provider, user);
-				accessToken = findNextJSCookie(input.req, accessTokenKey);
-				break;
-			case SSRType.NUXTJS:
-				var user: string = findNuxtJSCookie(input.req, userKey);
-				var accessTokenKey: string = constructAccessTokenKey(provider, user);
-				accessToken = findNuxtJSCookie(input.req, accessTokenKey);
-				break;
-			case SSRType.ASTRO:
-				var user: string = input.req.cookies.get(userKey).value;
-				var accessTokenKey: string = constructAccessTokenKey(provider, user);
-				accessToken = input.req.cookies.get(accessTokenKey).value;
-			case SSRType.SOLIDSTART:
-				var user: string = findSolidStartCookie(input.req, userKey);
-				var accessTokenKey: string = constructAccessTokenKey(provider, user);
-				accessToken = findSolidStartCookie(input.req, accessTokenKey);
-		}
-		return accessToken;
-	});
+	const userKey: string = constructUserKey(provider);
+
+	switch (input.tokenRetrieval) {
+		case SSRType.NEXTJS:
+			var user: string = findNextJSCookie(input.req, userKey);
+			var accessTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ACCESS_TOKEN
+			);
+			var idTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ID_TOKEN
+			);
+			accessToken = findNextJSCookie(input.req, accessTokenKey);
+			idToken = findNextJSCookie(input.req, idTokenKey);
+			break;
+		case SSRType.NUXTJS:
+			var user: string = findNuxtJSCookie(input.req, userKey);
+			var accessTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ACCESS_TOKEN
+			);
+			var idTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ID_TOKEN
+			);
+			accessToken = findNuxtJSCookie(input.req, accessTokenKey);
+			idToken = findNuxtJSCookie(input.req, idTokenKey);
+			break;
+		case SSRType.ASTRO:
+			var user: string = input.req.cookies.get(userKey).value;
+			var accessTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ACCESS_TOKEN
+			);
+			var idTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ID_TOKEN
+			);
+			accessToken = input.req.cookies.get(accessTokenKey).value;
+			idToken = input.req.cookies.get(idTokenKey).value;
+		case SSRType.SOLIDSTART:
+			var user: string = findSolidStartCookie(input.req, userKey);
+			var accessTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ACCESS_TOKEN
+			);
+			var idTokenKey: string = constructTokenKey(
+				provider,
+				user,
+				JWTType.ID_TOKEN
+			);
+			accessToken = findSolidStartCookie(input.req, accessTokenKey);
+			idToken = findSolidStartCookie(input.req, idTokenKey);
+	}
+
+	const identityId: string | undefined = await getId(idToken);
+	let credentials: Credentials | undefined;
+
+	if (identityId) {
+		credentials = await getCredentials(idToken, identityId);
+	}
+
+	const result: AmplifyUser = {
+		isSignedIn: true,
+		accessToken: accessToken,
+		idToken: idToken,
+	};
+
+	if (credentials) {
+		result.awsCreds = {
+			accessKey: credentials.AccessKeyId!,
+			secretKey: credentials.SecretKey!,
+			sessionToken: credentials.SessionToken!,
+			identityId: identityId!,
+		};
+	}
+
+	return result;
 }
 
 function findNextJSCookie(req: any, key: string) {
@@ -71,11 +151,15 @@ function findSolidStartCookie(req: any, key: string) {
 	return parseCookies(req.headers.get('Cookie'))[key];
 }
 
-function constructAccessTokenKey(provider: ProviderTypes, user: string) {
+function constructTokenKey(
+	provider: ProviderTypes,
+	user: string,
+	jwtType: JWTType
+) {
 	switch (provider) {
 		default:
 			const { aws_user_pools_web_client_id } = Amplify.getConfig();
-			return `${provider}.${aws_user_pools_web_client_id}.${user}.accessToken`;
+			return `${provider}.${aws_user_pools_web_client_id}.${user}.${jwtType}`;
 	}
 }
 
@@ -102,10 +186,47 @@ function parseCookies(cookieString): Object {
 			return Object.assign(res, { [key]: val });
 		}
 	}, {});
-	// for (var i = 0; i < cookieString.length; i++) {
-	// 	var nameValue = cookieString[i].split('=');
-	// 	cookies[nameValue[0].trim()] = nameValue[1];
-	// }
 	console.log('parseCookies: end', cookies);
 	return cookies;
+}
+
+async function getCredentials(
+	idToken: string,
+	identityId: string
+): Promise<Credentials | undefined> {
+	const { aws_cognito_region, aws_user_pools_id } = Amplify.getConfig();
+	const client = new CognitoIdentityClient({ region: aws_cognito_region });
+	const loginsKey = `cognito-idp.${aws_cognito_region}.amazonaws.com/${aws_user_pools_id}`;
+	const logins = {};
+	logins[loginsKey] = idToken;
+	const input = {
+		// GetCredentialsForIdentityInput
+		IdentityId: identityId, // required
+		Logins: logins,
+	};
+	const command = new GetCredentialsForIdentityCommand(input);
+	const response = await client.send(command);
+	return response.Credentials;
+}
+
+async function getId(idToken: string): Promise<string | undefined> {
+	const {
+		aws_cognito_region,
+		aws_cognito_identity_pool_id,
+		aws_user_pools_id,
+	} = Amplify.getConfig();
+
+	const client = new CognitoIdentityClient({
+		region: aws_cognito_region,
+	});
+	const loginsKey = `cognito-idp.${aws_cognito_region}.amazonaws.com/${aws_user_pools_id}`;
+	const logins = {};
+	logins[loginsKey] = idToken;
+	const input = {
+		IdentityPoolId: aws_cognito_identity_pool_id, // required
+		Logins: logins,
+	};
+	const command = new GetIdCommand(input);
+	const response = await client.send(command);
+	return response.IdentityId;
 }
