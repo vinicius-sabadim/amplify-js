@@ -87,6 +87,15 @@ export class AmplifyClass {
 		this._userCallbacks.forEach(callback => callback(this._user));
 	}
 
+	clearUser() {
+		this._user = {
+			accessToken: '',
+			idToken: '',
+			refreshToken: '',
+			isSignedIn: false,
+		};
+	}
+
 	getUser(): AmplifyUser {
 		if (this._user.awsCreds) {
 			const awsCreds = { ...this._user.awsCreds };

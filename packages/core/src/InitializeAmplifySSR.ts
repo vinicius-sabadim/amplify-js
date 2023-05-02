@@ -7,7 +7,7 @@ import {
 import { Amplify, AmplifyUser } from './Amplify';
 import { log } from 'console';
 
-export enum SSRType {
+export enum FrameworkType {
 	NEXTJS = 'NEXTJS',
 	NUXTJS = 'NUXTJS',
 	ASTRO = 'ASTRO',
@@ -25,25 +25,39 @@ enum JWTType {
 	ID_TOKEN = 'idToken',
 }
 
-export type initializeSSRInput = {
+export type InitializeSSRInput = {
 	req: any;
 	// RES not always available, such as in NextJS Edge runtime
-	res: any;
+	res?: any;
 	config: any;
-	tokenRetrieval: SSRType | AccessToken;
+	tokenRetrieval: FrameworkType | AccessToken;
 };
 
-export async function initializeSSR(
-	input: initializeSSRInput,
-	provider: ProviderTypes = ProviderTypes.COGNITO
+export async function initializeSSR<ReturnType>(
+	input: InitializeSSRInput,
+	provider: ProviderTypes = ProviderTypes.COGNITO,
+	amplifyWorkload: <ReturnType>() => Promise<ReturnType>
 ) {
 	Amplify.configure(input.config);
 
 	Amplify.setUser(await deriveUserFromCookies(input, provider));
+
+	let result;
+	try {
+		result = await amplifyWorkload();
+	} catch (e) {
+		console.log('e', e);
+		Amplify.clearUser();
+	}
+	Amplify.clearUser();
+
+	console.log('result', result);
+
+	return result;
 }
 
 async function deriveUserFromCookies(
-	input: initializeSSRInput,
+	input: InitializeSSRInput,
 	provider: ProviderTypes = ProviderTypes.COGNITO
 ): Promise<AmplifyUser> {
 	let accessToken;
@@ -52,7 +66,7 @@ async function deriveUserFromCookies(
 	const userKey: string = constructUserKey(provider);
 
 	switch (input.tokenRetrieval) {
-		case SSRType.NEXTJS:
+		case FrameworkType.NEXTJS:
 			var user: string = findNextJSCookie(input.req, userKey);
 			var accessTokenKey: string = constructTokenKey(
 				provider,
@@ -67,7 +81,7 @@ async function deriveUserFromCookies(
 			accessToken = findNextJSCookie(input.req, accessTokenKey);
 			idToken = findNextJSCookie(input.req, idTokenKey);
 			break;
-		case SSRType.NUXTJS:
+		case FrameworkType.NUXTJS:
 			var user: string = findNuxtJSCookie(input.req, userKey);
 			var accessTokenKey: string = constructTokenKey(
 				provider,
@@ -82,7 +96,7 @@ async function deriveUserFromCookies(
 			accessToken = findNuxtJSCookie(input.req, accessTokenKey);
 			idToken = findNuxtJSCookie(input.req, idTokenKey);
 			break;
-		case SSRType.ASTRO:
+		case FrameworkType.ASTRO:
 			var user: string = input.req.cookies.get(userKey).value;
 			var accessTokenKey: string = constructTokenKey(
 				provider,
@@ -96,7 +110,7 @@ async function deriveUserFromCookies(
 			);
 			accessToken = input.req.cookies.get(accessTokenKey).value;
 			idToken = input.req.cookies.get(idTokenKey).value;
-		case SSRType.SOLIDSTART:
+		case FrameworkType.SOLIDSTART:
 			var user: string = findSolidStartCookie(input.req, userKey);
 			var accessTokenKey: string = constructTokenKey(
 				provider,
