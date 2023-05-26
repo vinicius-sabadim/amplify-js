@@ -1,4 +1,4 @@
-import { Amplify } from '../Amplify';
+import { AmplifyClass } from '../Amplify';
 import { sign } from '../Signer';
 
 export async function httpClient({
@@ -9,6 +9,7 @@ export async function httpClient({
 	headers,
 	service,
 	region,
+	amplify,
 }: {
 	endpoint: string;
 	authMode: 'SigV4' | 'JWT' | 'None';
@@ -17,10 +18,11 @@ export async function httpClient({
 	headers: Record<string, string>;
 	service: string;
 	region: string;
+	amplify: AmplifyClass;
 }) {
 	let libHeaders = {};
 	if (authMode === 'SigV4') {
-		const creds = Amplify.getUser();
+		const creds = amplify.getUser();
 		// add headers
 		const signed_params = getSignedParams({
 			region,
@@ -39,7 +41,7 @@ export async function httpClient({
 	}
 
 	if (authMode === 'JWT') {
-		const user = Amplify.getUser();
+		const user = amplify.getUser();
 		libHeaders['Authorization'] = user.idToken;
 	}
 	return callFetchWithRetry({
