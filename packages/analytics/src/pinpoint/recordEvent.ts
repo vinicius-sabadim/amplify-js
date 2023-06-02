@@ -44,6 +44,7 @@ export function record(content: RecordContent) {
 			method: 'POST',
 			service: 'mobiletargeting',
 			region,
+			amplify: Amplify,
 		});
 		console.log('recording event');
 	}
@@ -100,6 +101,7 @@ async function createNewEndpoint({ userId, region, appId }) {
 		method: 'PUT',
 		service: 'mobiletargeting',
 		region,
+		amplify: Amplify,
 	});
 
 	if (result?.Message === 'Accepted') {

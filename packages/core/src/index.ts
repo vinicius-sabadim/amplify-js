@@ -33,7 +33,7 @@ export { FacebookOAuth, GoogleOAuth } from './OAuthHelper';
 export { AppState, AsyncStorage, Linking } from './RNComponents';
 export { Credentials, CredentialsClass } from './Credentials';
 export { ServiceWorker } from './ServiceWorker';
-export { ICredentials } from './types';
+export { ICredentials, ServerFn, ServerFnWrapper } from './types';
 export { StorageHelper, MemoryStorage } from './StorageHelper';
 export { UniversalStorage } from './UniversalStorage';
 export { Platform, getAmplifyUserAgent } from './Platform';

@@ -1,5 +1,6 @@
 import { InputLogEvent, LogGroup } from '@aws-sdk/client-cloudwatch-logs';
 import { Credentials } from '@aws-sdk/types';
+import { AmplifyClass } from '../Amplify';
 
 export interface AmplifyConfig {
 	Analytics?: object;
@@ -63,3 +64,9 @@ export interface CloudWatchDataTracker {
 	logEvents: InputLogEvent[];
 	verifiedLogGroup?: LogGroup;
 }
+
+export type ServerFn<T> = (amplify: AmplifyClass) => T;
+export type ServerFnWrapper<T> = {
+	fn: ServerFn<T>;
+	name: string;
+};

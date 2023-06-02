@@ -1,7 +1,16 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+import { AmplifyClass } from '@aws-amplify/core';
+import { ServerFn } from '@aws-amplify/core';
 import { Source, DocumentNode, GraphQLError } from 'graphql';
 export { OperationTypeNode } from 'graphql';
+
+// export type ServerGraphQLFn<T> = (amplify: AmplifyClass) => T;
+
+export type QueryType = (
+	options: GraphQLOptions,
+	additionalHeaders?: { [key: string]: string }
+) => Promise<GraphQLResult>;
 
 export enum GRAPHQL_AUTH_MODE {
 	API_KEY = 'API_KEY',

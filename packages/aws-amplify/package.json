@@ -53,6 +53,7 @@
     "@aws-amplify/pubsub": "5.0.9",
     "@aws-amplify/storage": "5.0.9",
     "@aws-amplify/xr": "4.0.9",
+    "@aws-amplify/amplify-server": "0.0.1",
     "tslib": "^2.0.0"
   },
   "jest": {

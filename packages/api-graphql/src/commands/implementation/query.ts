@@ -1,8 +1,8 @@
 import {
 	AmplifyClass,
-	parseAWSExports,
 	getAmplifyUserAgent,
 	httpClient,
+	parseAWSExports,
 } from '@aws-amplify/core';
 import type { GraphQLOptions, GraphQLResult } from '../../types';
 export const USER_AGENT_HEADER = 'x-amz-user-agent';
