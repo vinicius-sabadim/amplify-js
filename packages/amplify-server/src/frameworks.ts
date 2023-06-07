@@ -1,20 +1,26 @@
 export interface FrameworkType {
 	name: string;
-	req: any;
-	res?: any;
+	context: any;
 	version?: string;
 }
 
 export class NextAuth implements FrameworkType {
 	name = FrameworkNames.Next;
-	req: any;
-	res: any;
-	constructor(req, res?) {
-		this.req = req;
-		this.res = res;
+	context: any;
+	constructor(context) {
+		this.context = context;
+	}
+}
+
+export class NuxtAuth implements FrameworkType {
+	name = FrameworkNames.Nuxt;
+	context: any;
+	constructor(context) {
+		this.context = context;
 	}
 }
 
 export enum FrameworkNames {
 	Next = 'Next',
+	Nuxt = 'Nuxt',
 }

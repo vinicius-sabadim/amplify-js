@@ -1,2 +1,2 @@
 export { AmplifyServerWorkload } from './amplifyServerPayload';
-export { NextAuth } from './frameworks';
+export { NextAuth, NuxtAuth } from './frameworks';

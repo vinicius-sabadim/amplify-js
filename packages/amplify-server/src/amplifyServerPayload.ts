@@ -20,9 +20,6 @@ export type WorkloadInput<T> = {
 	awsconfig: any;
 	framework: FrameworkType;
 	fns: ServerFnWrapper<QueryType>[];
-	// functions is an array of functions that the customer imports. These functions HAVE the amplify instance as an argument.
-	// we internally create a "sandbox" object that has access to the created instance, and it creates key/value pairs for each passed function. The keys are the function names, but and the values are functions. The function signatures are the imported functions MINUS the amplify argument, but the implementation delegates to the imported function and passes the Amplify instance on behalf of the customer.
-
 	workload: (isolate: AmplifyServerIsolate) => Promise<T>;
 };
 
@@ -54,9 +51,6 @@ export class AmplifyServerIsolate {
 	query: QueryType;
 	constructor(input: AmplifyIsolateInput) {
 		this.amplify = input.amplifyInstance;
-
-		console.log('input.fns', input.fns);
-
 		input.fns.forEach(fn => {
 			this[fn.name] = fn.fn(this.amplify);
 		}, this);
@@ -82,7 +76,7 @@ async function deriveUserFromCookies(
 
 	switch (framework.name) {
 		case FrameworkNames.Next:
-			var user: string = findNextJSCookie(framework.req, userKey);
+			var user: string = findNextJSCookie(framework.context.req, userKey);
 			var accessTokenKey: string = constructTokenKey(
 				amplify,
 				provider,
@@ -95,24 +89,26 @@ async function deriveUserFromCookies(
 				user,
 				JWTType.ID_TOKEN
 			);
-			accessToken = findNextJSCookie(framework.req, accessTokenKey);
-			idToken = findNextJSCookie(framework.req, idTokenKey);
+			accessToken = findNextJSCookie(framework.context.req, accessTokenKey);
+			idToken = findNextJSCookie(framework.context.req, idTokenKey);
 			break;
-		// case FrameworkType.NUXTJS:
-		// 	var user: string = findNuxtJSCookie(input.req, userKey);
-		// 	var accessTokenKey: string = constructTokenKey(
-		// 		provider,
-		// 		user,
-		// 		JWTType.ACCESS_TOKEN
-		// 	);
-		// 	var idTokenKey: string = constructTokenKey(
-		// 		provider,
-		// 		user,
-		// 		JWTType.ID_TOKEN
-		// 	);
-		// 	accessToken = findNuxtJSCookie(input.req, accessTokenKey);
-		// 	idToken = findNuxtJSCookie(input.req, idTokenKey);
-		// 	break;
+		case FrameworkNames.Nuxt:
+			var user: string = findNuxtJSCookie(framework.context, userKey);
+			var accessTokenKey: string = constructTokenKey(
+				amplify,
+				provider,
+				user,
+				JWTType.ACCESS_TOKEN
+			);
+			var idTokenKey: string = constructTokenKey(
+				amplify,
+				provider,
+				user,
+				JWTType.ID_TOKEN
+			);
+			accessToken = findNuxtJSCookie(framework.context, accessTokenKey);
+			idToken = findNuxtJSCookie(framework.context, idTokenKey);
+			break;
 		// case FrameworkType.ASTRO:
 		// 	var user: string = input.req.cookies.get(userKey).value;
 		// 	var accessTokenKey: string = constructTokenKey(
@@ -172,9 +168,9 @@ function findNextJSCookie(req: any, key: string) {
 	return req.cookies[key] ?? req.cookies.get(key).value;
 }
 
-function findNuxtJSCookie(req: any, key: string) {
-	return req?.headers.cookie
-		? parseCookies(req?.headers.cookie)[key]
+function findNuxtJSCookie(context: any, key: string) {
+	return context?.headers.cookie
+		? parseCookies(context?.headers.cookie)[key]
 		: parseCookies(document?.cookie)[key];
 }
 
@@ -205,8 +201,6 @@ function constructUserKey(provider: ProviderTypes, amplify: AmplifyClass) {
 
 function parseCookies(cookieString): Object {
 	var cookies = {};
-	console.log('parseCookies: start', cookieString);
-
 	cookies = cookieString.split(';').reduce((res, c) => {
 		const [key, val] = c.trim().split('=').map(decodeURIComponent);
 		const allNumbers = str => /^\d+$/.test(str);
@@ -218,7 +212,6 @@ function parseCookies(cookieString): Object {
 			return Object.assign(res, { [key]: val });
 		}
 	}, {});
-	console.log('parseCookies: end', cookies);
 	return cookies;
 }
 
