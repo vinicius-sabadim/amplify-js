@@ -17,7 +17,7 @@ import {
 	OpType,
 } from '../src/types';
 import { createMutationInstanceFromModelOperation } from '../src/sync/utils';
-import { MutationEvent } from '../src/sync/';
+import { SyncEngine, MutationEvent } from '../src/sync/';
 import {
 	Category,
 	CustomUserAgentDetails,
@@ -263,16 +263,9 @@ describe('error handler', () => {
 jest.mock('@aws-amplify/api-rest', () => {
 	return {
 		...jest.requireActual('@aws-amplify/api-rest'),
-		RestClient() {
-			return {
-				post: mockRestPost.mockImplementation(() => {
-					return Promise.reject(axiosError);
-				}),
-				getCancellableToken: () => {},
-				updateRequestToBeCancellable: () => {},
-				isCancel: () => false,
-			};
-		},
+		post: mockRestPost.mockImplementation(() => {
+			return Promise.reject(axiosError);
+		}),
 	};
 });
 
@@ -330,11 +323,9 @@ async function instantiateMutationProcessor({
 } = {}) {
 	let schema: InternalSchema = internalTestSchema();
 
-	jest.doMock('../src/sync/', () => ({
-		SyncEngine: {
-			getNamespace: () => schema.namespaces['sync'],
-		},
-	}));
+	jest.spyOn(SyncEngine, 'getNamespace').mockImplementation(() => {
+		return schema.namespaces['sync'];
+	});
 
 	const { initSchema, DataStore } = require('../src/datastore/datastore');
 	const classes = initSchema(testSchema());
