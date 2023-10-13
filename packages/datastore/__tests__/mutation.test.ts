@@ -260,9 +260,9 @@ describe('error handler', () => {
 });
 // Mocking restClient.post to throw the error we expect
 // when experiencing poor network conditions
-jest.mock('@aws-amplify/api-rest', () => {
+jest.mock('@aws-amplify/api-rest/internals', () => {
 	return {
-		...jest.requireActual('@aws-amplify/api-rest'),
+		...jest.requireActual('@aws-amplify/api-rest/internals'),
 		post: mockRestPost.mockImplementation(() => {
 			return Promise.reject(axiosError);
 		}),
