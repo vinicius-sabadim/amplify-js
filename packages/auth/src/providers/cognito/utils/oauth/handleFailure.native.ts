@@ -7,10 +7,8 @@ import { oAuthStore } from './oAuthStore';
 import { AMPLIFY_SYMBOL } from '@aws-amplify/core/internals/utils';
 import { resolveAndClearInflightPromises } from './inflightPromise';
 
-export const handleFailure = async (
-	error: AuthError | unknown
-): Promise<void> => {
-	resolveAndClearInflightPromises();
+export const handleFailure = async (error: AuthError): Promise<void> => {
+    resolveAndClearInflightPromises();
 	await oAuthStore.clearOAuthInflightData();
 	Hub.dispatch(
 		'auth',
@@ -18,4 +16,7 @@ export const handleFailure = async (
 		'Auth',
 		AMPLIFY_SYMBOL
 	);
+
+	throw error;
 };
+
