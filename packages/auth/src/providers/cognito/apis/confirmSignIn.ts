@@ -35,6 +35,12 @@ import {
 } from '../utils/clients/CognitoIdentityProvider/types';
 import { tokenOrchestrator } from '../tokenProvider';
 import { getCurrentUser } from './getCurrentUser';
+import {
+	KEY_PASSWORDLESS_ACTION,
+	KEY_PASSWORDLESS_SIGN_IN_METHOD,
+	isMagicLinkFragment,
+	loadMagicLinkSignInState,
+} from './passwordless';
 
 /**
  * Continues or completes the sign in process when required by the initial call to `signIn`.
@@ -55,13 +61,26 @@ export async function confirmSignIn(
 	input: ConfirmSignInInput
 ): Promise<ConfirmSignInOutput> {
 	const { challengeResponse, options } = input;
+	let clientMetaData = options?.clientMetadata;
+
+	if (isMagicLinkFragment(challengeResponse)) {
+		await loadMagicLinkSignInState(challengeResponse);
+	}
+
 	const { username, challengeName, signInSession, signInDetails } =
 		signInStore.getState();
 
+	if (signInDetails?.passwordlessMethod) {
+		if (!clientMetaData) {
+			clientMetaData = {};
+		}
+		clientMetaData[KEY_PASSWORDLESS_ACTION] = 'CONFIRM';
+		clientMetaData[KEY_PASSWORDLESS_SIGN_IN_METHOD] =
+			signInDetails?.passwordlessMethod;
+	}
+
 	const authConfig = Amplify.getConfig().Auth?.Cognito;
 	assertTokenProviderConfig(authConfig);
-
-	const clientMetaData = options?.clientMetadata;
 
 	assertValidationError(
 		!!challengeResponse,

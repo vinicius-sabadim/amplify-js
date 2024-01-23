@@ -24,9 +24,6 @@ import {
 	autoSignInUserConfirmed,
 	autoSignInWhenUserIsConfirmedWithLink,
 	setUsernameUsedForAutoSignIn,
-	isSignUpWithEmailAndMagicLinkInput,
-	isSignUpWithEmailAndOTPInput,
-	isSignUpWithSMSAndOTPInput,
 } from '../utils/signUpHelpers';
 import { setAutoSignIn } from './autoSignIn';
 import { getAuthUserAgentValue } from '../../../utils';
@@ -42,7 +39,16 @@ import {
 	SignUpWithPasswordOutput,
 	SignUpWithSMSAndOTPOutput,
 } from '../types/outputs';
-import { signUpPasswordless } from './signUpPasswordless';
+import {
+	signUp as signUpPasswordless,
+	isSignUpWithEmailAndMagicLinkInput,
+	isSignUpWithEmailAndOTPInput,
+	isSignUpWithSMSAndOTPInput,
+	assertSignUpWithEmailOptions,
+	assertSignUpWithSMSOptions,
+} from './passwordless';
+import { AuthError } from '../../../errors/AuthError';
+import { validationErrorMap } from '../../../common/AuthErrorStrings';
 
 import type { confirmSignIn } from './confirmSignIn';
 
@@ -120,14 +126,20 @@ export async function signUp(
 	if (passwordless) {
 		// Iterate through signUpPasswordless calls to make TypeScript happy
 		if (isSignUpWithEmailAndMagicLinkInput(input)) {
+			assertSignUpWithEmailOptions(input.options);
 			return signUpPasswordless(input);
 		} else if (isSignUpWithEmailAndOTPInput(input)) {
+			assertSignUpWithEmailOptions(input.options);
 			return signUpPasswordless(input);
 		} else if (isSignUpWithSMSAndOTPInput(input)) {
+			assertSignUpWithSMSOptions(input.options);
 			return signUpPasswordless(input);
 		} else {
-			// TODO: implement validation error
-			throw new Error('SMS does not support MagicLink');
+			const errorCode = AuthValidationErrorCode.IncorrectPasswordlessMethod;
+			throw new AuthError({
+				name: errorCode,
+				...validationErrorMap[errorCode],
+			});
 		}
 	} else {
 		return signUpWithPassword(input);
