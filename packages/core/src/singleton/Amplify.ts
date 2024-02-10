@@ -18,6 +18,9 @@ export class AmplifyClass {
 		| undefined = undefined;
 	resourcesConfig: ResourcesConfig;
 	libraryOptions: LibraryOptions;
+	isConfigured: boolean = false;
+	configuredPromise: Promise<void>;
+	configuredPromiseResolver: (value: void | PromiseLike<void>) => void = () => {};
 
 	/**
 	 * Cross-category Auth utilities.
@@ -30,6 +33,9 @@ export class AmplifyClass {
 		this.resourcesConfig = {};
 		this.libraryOptions = {};
 		this.Auth = new AuthClass();
+		this.configuredPromise = new Promise((res) => {
+			this.configuredPromiseResolver = res;
+		});
 	}
 
 	/**
@@ -65,7 +71,7 @@ export class AmplifyClass {
 
 		// Make resource config immutable
 		this.resourcesConfig = deepFreeze(this.resourcesConfig);
-
+		this.isConfigured = true;
 		this.Auth.configure(this.resourcesConfig.Auth!, this.libraryOptions.Auth);
 
 		Hub.dispatch(
@@ -79,6 +85,8 @@ export class AmplifyClass {
 		);
 
 		this.notifyOAuthListener();
+		this.isConfigured = true;
+		this.configuredPromiseResolver();
 	}
 
 	/**
@@ -87,6 +95,18 @@ export class AmplifyClass {
 	 * @returns Returns the immutable back-end resource configuration.
 	 */
 	getConfig(): Readonly<ResourcesConfig> {
+		return this.resourcesConfig;
+	}
+
+	/**
+	 * Provides async access to the current back-end resource configuration for the Library.
+	 *
+	 * @returns Returns an Promise that returns an immutable back-end resource configuration.
+	 */
+	async getConfigAsync(): Promise<Readonly<ResourcesConfig>> {
+		if (!this.isConfigured) {
+			await this.configuredPromise;
+		}
 		return this.resourcesConfig;
 	}
 

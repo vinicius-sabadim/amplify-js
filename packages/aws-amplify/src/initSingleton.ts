@@ -102,4 +102,14 @@ export const DefaultAmplify = {
 	getConfig(): ResourcesConfig {
 		return Amplify.getConfig();
 	},
+
+	/**
+	 * Provides async access to the current back-end resource configuration for the Library.
+	 *
+	 * @returns Returns an Promise that returns an immutable back-end resource configuration.
+	 */
+	async getConfigAsync(): Promise<Readonly<ResourcesConfig>> {
+		return Amplify.getConfigAsync();
+	}
+
 };

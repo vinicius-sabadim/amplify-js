@@ -95,6 +95,17 @@ const modelIntrospection: ModelIntrospection = {
 	nonModels: {},
 };
 
+describe.only('Amplify.configure and Amplify.getConfigAsync', () => {
+	it('should await until library is configured once', async () => {
+		await new Promise<void>(res => {
+			Amplify.getConfigAsync().then(() => { res()})
+			Amplify.configure({});
+		})
+		
+		await Amplify.getConfigAsync();
+	})
+});
+
 describe('Amplify.configure() and Amplify.getConfig()', () => {
 	const mockLegacyConfig = {
 		aws_project_region: 'us-west-2',
