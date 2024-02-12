@@ -1,5 +1,6 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+import { Amplify } from '../Amplify';
 import {
 	CredentialsAndIdentityId,
 	AuthConfig,
@@ -59,7 +60,7 @@ export class AuthClass {
 		let tokens: AuthTokens | undefined;
 		let credentialsAndIdentityId: CredentialsAndIdentityId | undefined;
 		let userSub: string | undefined;
-
+		const authConfig = (await Amplify.getConfigAsync()).Auth;
 		// Get tokens will throw if session cannot be refreshed (network or service error) or return null if not available
 		tokens = await this.getTokens(options);
 
@@ -70,7 +71,7 @@ export class AuthClass {
 			credentialsAndIdentityId =
 				await this.authOptions?.credentialsProvider?.getCredentialsAndIdentityId(
 					{
-						authConfig: this.authConfig,
+						authConfig,
 						tokens,
 						authenticated: true,
 						forceRefresh: options.forceRefresh,
