@@ -15,13 +15,13 @@ interface LexV2BotConfig {
 	region: string;
 }
 
-interface InteractionsLexV1Config {
+type InteractionsLexV1Config = {
 	LexV1: Record<string, LexV1BotConfig>;
-}
+};
 
-interface InteractionsLexV2Config {
+type InteractionsLexV2Config = {
 	LexV2: Record<string, LexV2BotConfig>;
-}
+};
 
 export type InteractionsConfig = AtLeastOne<
 	InteractionsLexV1Config & InteractionsLexV2Config

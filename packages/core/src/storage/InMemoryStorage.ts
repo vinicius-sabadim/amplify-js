@@ -15,7 +15,6 @@ export class InMemoryStorage implements Storage {
 		if (index > this.length - 1) {
 			return null;
 		}
-
 		return Array.from(this.storage.keys())[index];
 	}
 

@@ -3,22 +3,22 @@
 import { Headers } from '../../clients';
 import { AtLeastOne } from '../types';
 
-export interface LibraryAPIOptions {
+export type LibraryAPIOptions = {
 	GraphQL?: {
 		// custom headers for given GraphQL service. Will be applied to all operations.
-		headers?(options?: {
+		headers?: (options?: {
 			query?: string;
 			variables?: Record<string, DocumentType>;
-		}): Promise<Headers | Record<string, unknown>>;
+		}) => Promise<Headers | {}>;
 		withCredentials?: boolean;
 	};
 	REST?: {
 		// custom headers for given REST service. Will be applied to all operations.
-		headers?(options: { apiName: string }): Promise<Headers>;
+		headers?: (options: { apiName: string }) => Promise<Headers>;
 	};
-}
+};
 
-interface APIGraphQLConfig {
+type APIGraphQLConfig = {
 	/**
 	 * Required GraphQL endpoint, must be a valid URL string.
 	 */
@@ -45,9 +45,9 @@ interface APIGraphQLConfig {
 	 */
 	defaultAuthMode: GraphQLAuthMode;
 	modelIntrospection?: ModelIntrospectionSchema;
-}
+};
 
-interface APIRestConfig {
+type APIRestConfig = {
 	/**
 	 * Required REST endpoint, must be a valid URL string.
 	 */
@@ -65,15 +65,15 @@ interface APIRestConfig {
 	 * @default 'execute-api'
 	 */
 	service?: string;
-}
+};
 
-export interface RESTProviderConfig {
+export type RESTProviderConfig = {
 	REST: Record<string, APIRestConfig>;
-}
+};
 
-export interface GraphQLProviderConfig {
+export type GraphQLProviderConfig = {
 	GraphQL: APIGraphQLConfig;
-}
+};
 
 export type APIConfig = AtLeastOne<RESTProviderConfig & GraphQLProviderConfig>;
 
@@ -101,12 +101,12 @@ export type DocumentType =
  *
  * Borrowed from: https://github.com/aws-amplify/samsara-cli/pull/377/commits/c08ea2c1a43f36aafe63b6d14d03f884e9c0c671#diff-21ae6faa2f22c15bb25ff9b272eaab7846c0650e2d267ab720546c19559583d0R4-R108
  */
-export interface ModelIntrospectionSchema {
+export type ModelIntrospectionSchema = {
 	version: 1;
 	models: SchemaModels;
 	nonModels: SchemaNonModels;
 	enums: SchemaEnums;
-}
+};
 
 /**
  * Top-level Entities on a Schema
@@ -115,42 +115,42 @@ export type SchemaModels = Record<string, SchemaModel>;
 export type SchemaNonModels = Record<string, SchemaNonModel>;
 export type SchemaEnums = Record<string, SchemaEnum>;
 
-export interface SchemaModel {
+export type SchemaModel = {
 	name: string;
 	attributes?: ModelAttribute[];
 	fields: Fields;
 	pluralName: string;
 	syncable?: boolean;
 	primaryKeyInfo: PrimaryKeyInfo;
-}
-export interface SchemaNonModel {
+};
+export type SchemaNonModel = {
 	name: string;
 	fields: Fields;
-}
-export interface SchemaEnum {
+};
+export type SchemaEnum = {
 	name: string;
 	values: string[];
-}
+};
 
-export interface ModelAttribute {
+export type ModelAttribute = {
 	type: string;
-	properties?: Record<string, any>;
-}
+	properties?: { [key: string]: any };
+};
 
-export interface SecondaryIndexAttribute {
+export type SecondaryIndexAttribute = {
 	type: 'key';
 	properties: {
 		name: string;
 		queryField: string;
 		fields: string[];
 	};
-}
+};
 
 /**
  * Field Definition
  */
 export type Fields = Record<string, Field>;
-export interface Field {
+export type Field = {
 	name: string;
 	type: FieldType;
 	isArray: boolean;
@@ -159,11 +159,9 @@ export interface Field {
 	isArrayNullable?: boolean;
 	attributes?: FieldAttribute[];
 	association?: AssociationType;
-}
+};
 
-export interface ModelFieldType {
-	model: string;
-}
+export type ModelFieldType = { model: string };
 
 export type FieldType =
 	| 'ID'
@@ -193,9 +191,9 @@ export enum CodeGenConnectionType {
 	BELONGS_TO = 'BELONGS_TO',
 	HAS_MANY = 'HAS_MANY',
 }
-export interface AssociationBaseType {
+export type AssociationBaseType = {
 	connectionType: CodeGenConnectionType;
-}
+};
 
 export type AssociationHasMany = AssociationBaseType & {
 	connectionType: CodeGenConnectionType.HAS_MANY;
@@ -216,8 +214,8 @@ export type AssociationType =
 	| AssociationHasOne
 	| AssociationBelongsTo;
 
-export interface PrimaryKeyInfo {
+export type PrimaryKeyInfo = {
 	isCustomPrimaryKey: boolean;
 	primaryKeyFieldName: string;
 	sortKeyFieldNames: string[];
-}
+};

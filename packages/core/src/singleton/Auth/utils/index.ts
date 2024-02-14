@@ -1,24 +1,24 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
+import { AuthConfigurationErrorCode, assert } from './errorHelpers';
 import { base64Decoder } from '../../../utils/convert';
 import {
 	AuthConfig,
-	CognitoIdentityPoolConfig,
-	CognitoUserPoolAndIdentityPoolConfig,
-	CognitoUserPoolConfig,
 	JWT,
-	OAuthConfig,
+	AuthUserPoolAndIdentityPoolConfig,
+	CognitoUserPoolConfig,
+	CognitoUserPoolAndIdentityPoolConfig,
+	CognitoIdentityPoolConfig,
 	StrictUnion,
+	OAuthConfig,
 } from '../types';
-
-import { AuthConfigurationErrorCode, assert } from './errorHelpers';
 
 export function assertTokenProviderConfig(
 	cognitoConfig?: StrictUnion<
 		| CognitoUserPoolConfig
 		| CognitoUserPoolAndIdentityPoolConfig
 		| CognitoIdentityPoolConfig
-	>,
+	>
 ): asserts cognitoConfig is
 	| CognitoUserPoolAndIdentityPoolConfig
 	| CognitoUserPoolConfig {
@@ -30,11 +30,14 @@ export function assertTokenProviderConfig(
 			!!cognitoConfig.userPoolId && !!cognitoConfig.userPoolClientId;
 	}
 
-	assert(assertionValid, AuthConfigurationErrorCode.AuthUserPoolException);
+	return assert(
+		assertionValid,
+		AuthConfigurationErrorCode.AuthUserPoolException
+	);
 }
 
 export function assertOAuthConfig(
-	cognitoConfig?: AuthConfig['Cognito'],
+	cognitoConfig?: AuthConfig['Cognito']
 ): asserts cognitoConfig is AuthConfig['Cognito'] & {
 	loginWith: {
 		oauth: OAuthConfig;
@@ -45,10 +48,9 @@ export function assertOAuthConfig(
 		!!cognitoConfig?.loginWith?.oauth?.redirectSignOut &&
 		!!cognitoConfig?.loginWith?.oauth?.redirectSignIn &&
 		!!cognitoConfig?.loginWith?.oauth?.responseType;
-
-	assert(
+	return assert(
 		validOAuthConfig,
-		AuthConfigurationErrorCode.OAuthNotConfigureException,
+		AuthConfigurationErrorCode.OAuthNotConfigureException
 	);
 }
 export function assertIdentityPoolIdConfig(
@@ -56,13 +58,23 @@ export function assertIdentityPoolIdConfig(
 		| CognitoUserPoolConfig
 		| CognitoUserPoolAndIdentityPoolConfig
 		| CognitoIdentityPoolConfig
-	>,
+	>
 ): asserts cognitoConfig is CognitoIdentityPoolConfig {
 	const validConfig = !!cognitoConfig?.identityPoolId;
-
-	assert(
+	return assert(
 		validConfig,
-		AuthConfigurationErrorCode.InvalidIdentityPoolIdException,
+		AuthConfigurationErrorCode.InvalidIdentityPoolIdException
+	);
+}
+
+function assertUserPoolAndIdentityPoolConfig(
+	authConfig: AuthConfig
+): asserts authConfig is AuthUserPoolAndIdentityPoolConfig {
+	const validConfig =
+		!!authConfig?.Cognito.identityPoolId && !!authConfig?.Cognito.userPoolId;
+	return assert(
+		validConfig,
+		AuthConfigurationErrorCode.AuthUserPoolAndIdentityPoolException
 	);
 }
 
@@ -81,7 +93,7 @@ export function decodeJWT(token: string): JWT {
 				.convert(base64)
 				.split('')
 				.map(char => `%${`00${char.charCodeAt(0).toString(16)}`.slice(-2)}`)
-				.join(''),
+				.join('')
 		);
 		const payload = JSON.parse(jsonStr);
 

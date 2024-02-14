@@ -16,65 +16,61 @@ interface JwtPayloadStandardFields {
 	sub?: string; // JWT sub https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2
 }
 
-type JsonPrimitive = null | string | number | boolean;
-
-/** JSON array type */
-type JsonArray = JsonPrimitive[];
+/** JSON type */
+type Json = null | string | number | boolean | Json[] | JsonObject;
 
 /** JSON Object type */
-interface JsonObject {
-	[x: string]: JsonPrimitive | JsonArray | JsonObject;
-}
+type JsonObject = { [name: string]: Json };
 
 export type JwtPayload = JwtPayloadStandardFields & JsonObject;
 
-export interface JWT {
+export type JWT = {
 	payload: JwtPayload;
-	toString(): string;
-}
+	toString: () => string;
+};
 
 export type JWTCreator = (stringJWT: string) => JWT;
 
-export interface AuthSession {
+export type AuthSession = {
 	tokens?: AuthTokens;
 	credentials?: AWSCredentials;
 	identityId?: string;
 	userSub?: string;
-}
+};
 
-export interface LibraryAuthOptions {
+export type LibraryAuthOptions = {
 	tokenProvider?: TokenProvider;
 	credentialsProvider?: CredentialsAndIdentityIdProvider;
-}
+};
 
-export interface Identity {
+export type Identity = {
 	id: string;
 	type: 'guest' | 'primary';
-}
+};
 
 export interface CredentialsAndIdentityIdProvider {
-	getCredentialsAndIdentityId(
-		getCredentialsOptions: GetCredentialsOptions,
-	): Promise<CredentialsAndIdentityId | undefined>;
-	clearCredentialsAndIdentityId(): void;
+	getCredentialsAndIdentityId: (
+		getCredentialsOptions: GetCredentialsOptions
+	) => Promise<CredentialsAndIdentityId | undefined>;
+	clearCredentialsAndIdentityId: () => void;
 }
 
-export interface TokenProvider {
-	getTokens({
+export type TokenProvider = {
+	getTokens: ({
 		forceRefresh,
 	}?: {
 		forceRefresh?: boolean;
-	}): Promise<AuthTokens | null>;
-}
+	}) => Promise<AuthTokens | null>;
+};
 
-export interface FetchAuthSessionOptions {
+export type FetchAuthSessionOptions = {
 	forceRefresh?: boolean;
-}
+};
 
-export interface AuthTokens {
+export type AuthTokens = {
 	idToken?: JWT;
 	accessToken: JWT;
-}
+};
 
 export type AuthStandardAttributeKey =
 	| 'address'
@@ -120,7 +116,7 @@ type StrictUnionHelper<T, TAll> = T extends any
 	: never;
 export type StrictUnion<T> = StrictUnionHelper<T, T>;
 
-export interface AuthIdentityPoolConfig {
+export type AuthIdentityPoolConfig = {
 	Cognito: CognitoIdentityPoolConfig & {
 		userPoolClientId?: never;
 		userPoolId?: never;
@@ -131,21 +127,21 @@ export interface AuthIdentityPoolConfig {
 		mfa?: never;
 		passwordFormat?: never;
 	};
-}
+};
 
-export interface CognitoIdentityPoolConfig {
+export type CognitoIdentityPoolConfig = {
 	identityPoolId: string;
 	allowGuestAccess?: boolean;
-}
+};
 
-export interface AuthUserPoolConfig {
+export type AuthUserPoolConfig = {
 	Cognito: CognitoUserPoolConfig & {
 		identityPoolId?: never;
 		allowGuestAccess?: never;
 	};
-}
+};
 
-export interface CognitoUserPoolConfig {
+export type CognitoUserPoolConfig = {
 	userPoolClientId: string;
 	userPoolId: string;
 	userPoolEndpoint?: string;
@@ -169,24 +165,22 @@ export interface CognitoUserPoolConfig {
 		requireNumbers?: boolean;
 		requireSpecialCharacters?: boolean;
 	};
-}
+};
 
-export interface OAuthConfig {
+export type OAuthConfig = {
 	domain: string;
-	scopes: OAuthScope[];
-	redirectSignIn: string[];
-	redirectSignOut: string[];
+	scopes: Array<OAuthScope>;
+	redirectSignIn: Array<string>;
+	redirectSignOut: Array<string>;
 	responseType: 'code' | 'token';
-	providers?: (OAuthProvider | CustomProvider)[];
-}
+	providers?: Array<OAuthProvider | CustomProvider>;
+};
 
 export type OAuthProvider = 'Google' | 'Facebook' | 'Amazon' | 'Apple';
-interface CustomProvider {
-	custom: string;
-}
+type CustomProvider = { custom: string };
 
-type CustomScope = string & Record<string, string>;
-export type OAuthScope =
+type CustomScope = string & {};
+type OAuthScope =
 	| 'email'
 	| 'openid'
 	| 'phone'
@@ -200,9 +194,9 @@ export type CognitoUserPoolWithOAuthConfig = CognitoUserPoolConfig & {
 		oauth: OAuthConfig;
 	};
 };
-export interface AuthUserPoolAndIdentityPoolConfig {
+export type AuthUserPoolAndIdentityPoolConfig = {
 	Cognito: CognitoUserPoolAndIdentityPoolConfig;
-}
+};
 
 export type CognitoUserPoolAndIdentityPoolConfig = CognitoUserPoolConfig &
 	CognitoIdentityPoolConfig;
@@ -211,28 +205,28 @@ export type GetCredentialsOptions =
 	| GetCredentialsAuthenticatedUser
 	| GetCredentialsUnauthenticatedUser;
 
-interface GetCredentialsAuthenticatedUser {
+type GetCredentialsAuthenticatedUser = {
 	authenticated: true;
 	forceRefresh?: boolean;
 	authConfig: AuthConfig | undefined;
 	tokens: AuthTokens;
-}
+};
 
-interface GetCredentialsUnauthenticatedUser {
+type GetCredentialsUnauthenticatedUser = {
 	authenticated: false;
 	forceRefresh?: boolean;
 	authConfig: AuthConfig | undefined;
 	tokens?: never;
-}
+};
 
-export interface CredentialsAndIdentityId {
+export type CredentialsAndIdentityId = {
 	credentials: AWSCredentials;
 	identityId?: string;
-}
+};
 
-export interface AWSCredentials {
+export type AWSCredentials = {
 	accessKeyId: string;
 	secretAccessKey: string;
 	sessionToken?: string;
 	expiration?: Date;
-}
+};

@@ -4,67 +4,67 @@
 import { AtLeastOne } from '../types';
 
 // Defaults for ConvertConfig
-interface SpeechGeneratorDefaults {
+type SpeechGeneratorDefaults = {
 	voiceId?: string;
-}
-interface TranscriptionDefaults {
+};
+type TranscriptionDefaults = {
 	language?: string;
-}
-interface TranslateTextDefaults {
+};
+type TranslateTextDefaults = {
 	sourceLanguage?: string;
 	targetLanguage?: string;
-}
+};
 
 // Defaults for IdentifyConfig
-interface IdentifyEntitiesDefaults {
+type IdentifyEntitiesDefaults = {
 	collectionId?: string;
 	maxEntities?: number;
-}
-interface IdentityLabelsDefaults {
+};
+type IdentityLabelsDefaults = {
 	type?: string;
-}
-interface IdentifyTextDefaults {
+};
+type IdentifyTextDefaults = {
 	format?: string;
-}
+};
 
 // Defaults for InterpretConfig
-interface InterpretTextDefaults {
+type InterpretTextDefaults = {
 	type?: string;
-}
+};
 
-interface ConvertConfig {
+type ConvertConfig = {
 	speechGenerator?: PredictionsProviderConfig<SpeechGeneratorDefaults>;
 	transcription?: PredictionsProviderConfig<TranscriptionDefaults>;
 	translateText?: PredictionsProviderConfig<TranslateTextDefaults>;
-}
+};
 
-interface IdentifyConfig {
+type IdentifyConfig = {
 	identifyEntities?: PredictionsProviderConfig<IdentifyEntitiesDefaults> & {
 		celebrityDetectionEnabled?: boolean;
 	};
 	identifyLabels?: PredictionsProviderConfig<IdentityLabelsDefaults>;
 	identifyText?: PredictionsProviderConfig<IdentifyTextDefaults>;
-}
+};
 
-interface InterpretConfig {
+type InterpretConfig = {
 	interpretText?: PredictionsProviderConfig<InterpretTextDefaults>;
-}
+};
 
-export interface PredictionsProviderConfig<T> {
+export type PredictionsProviderConfig<T> = {
 	region?: string;
 	proxy?: boolean;
 	defaults?: T;
-}
+};
 
-export interface PredictionsConvertConfig {
+export type PredictionsConvertConfig = {
 	convert: ConvertConfig;
-}
-export interface PredictionsIdentifyConfig {
+};
+export type PredictionsIdentifyConfig = {
 	identify: IdentifyConfig;
-}
-export interface PredictionsInterpretConfig {
+};
+export type PredictionsInterpretConfig = {
 	interpret: InterpretConfig;
-}
+};
 
 export type PredictionsConfig = AtLeastOne<
 	PredictionsConvertConfig &

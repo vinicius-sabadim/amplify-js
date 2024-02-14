@@ -168,11 +168,11 @@ export const mockAuthConfigWithOAuth = {
 				oauth: {
 					domain: 'oauth.domain.com',
 					scopes: [
-						'phone' as const,
-						'email' as const,
-						'openid' as const,
-						'profile' as const,
-						'aws.cognito.signin.user.admin' as const,
+						'phone',
+						'email',
+						'openid',
+						'profile',
+						'aws.cognito.signin.user.admin',
 					],
 					redirectSignIn: ['http://localhost:3000/'],
 					redirectSignOut: ['http://localhost:3000/'],
