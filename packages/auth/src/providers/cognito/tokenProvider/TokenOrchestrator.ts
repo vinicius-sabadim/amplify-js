@@ -3,6 +3,7 @@
 import {
 	AuthConfig,
 	AuthTokens,
+	CognitoUserPoolConfig,
 	FetchAuthSessionOptions,
 	Hub,
 } from '@aws-amplify/core';
@@ -52,6 +53,8 @@ export class TokenOrchestrator implements AuthTokenOrchestrator {
 	};
 
 	setAuthConfig(authConfig: AuthConfig) {
+		console.log('setAuthConfig', authConfig);
+		oAuthStore.setAuthConfig(authConfig.Cognito as CognitoUserPoolConfig);
 		this.authConfig = authConfig;
 	}
 
