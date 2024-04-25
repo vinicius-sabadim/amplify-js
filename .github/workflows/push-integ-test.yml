@@ -7,8 +7,7 @@ concurrency:
 
 on:
   push:
-    branches:
-      - next/main
+    branches: [next/main, fix-flaky-sign-in-oauth]
 
 jobs:
   e2e:
