@@ -8,7 +8,7 @@ concurrency:
 on:
   push:
     branches:
-      - replace-with-your-branch
+      - joonwonc/enable-custom-auth-integ
 
 jobs:
   e2e:
