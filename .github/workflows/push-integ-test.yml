@@ -8,7 +8,7 @@ concurrency:
 on:
   push:
     branches:
-      - main
+      - joonwonc/auth-resumable-smsmfa-actual
 
 jobs:
   e2e:
